@@ -1,0 +1,648 @@
+/**
+ * Public styles for Klientoora Card.
+ */
+
+.klientoora-card-floating-button {
+	align-items: center;
+	background: #111827;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	bottom: 24px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	font-size: 15px;
+	font-weight: 700;
+	gap: 8px;
+	height: 132px;
+	inset-inline-end: 24px;
+	justify-content: center;
+	line-height: 1.25;
+	padding: 16px;
+	position: fixed;
+	text-align: center;
+	text-decoration: none;
+	width: 132px;
+	z-index: 9999;
+}
+
+.klientoora-card-floating-button:hover,
+.klientoora-card-floating-button:focus {
+	background: #2563eb;
+	color: #fff;
+	outline: 2px solid #2563eb;
+	outline-offset: 3px;
+	text-decoration: none;
+}
+
+.klientoora-card-floating-button .dashicons {
+	font-size: 28px;
+	height: 28px;
+	width: 28px;
+}
+
+.klientoora-card-floating-button__label {
+	display: block;
+	max-width: 100%;
+	overflow-wrap: anywhere;
+}
+
+.klientoora-card-overlay[hidden],
+.klientoora-card-modal[hidden],
+.klientoora-card-offcanvas[hidden],
+.klientoora-card-form[hidden],
+.klientoora-card-registration-success[hidden] {
+	display: none;
+}
+
+.klientoora-card-modal-open {
+	overflow: hidden;
+}
+
+.klientoora-card-overlay {
+	background: rgba(17, 24, 39, 0.55);
+	inset: 0;
+	position: fixed;
+	z-index: 10000;
+}
+
+.klientoora-card-modal,
+.klientoora-card-offcanvas {
+	background: #fff;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+	color: #1d2327;
+	direction: rtl;
+	position: fixed;
+	z-index: 10001;
+}
+
+.klientoora-card-modal {
+	border-radius: 8px;
+	left: 50%;
+	max-height: calc(100vh - 48px);
+	max-width: min(420px, calc(100vw - 32px));
+	overflow-y: auto;
+	padding: 28px;
+	text-align: right;
+	top: 50%;
+	transform: translate(-50%, -50%) scale(0.96);
+	width: 100%;
+}
+
+.klientoora-card-offcanvas {
+	bottom: 0;
+	max-width: min(420px, 100vw);
+	padding: 32px 28px;
+	right: 0;
+	text-align: right;
+	top: 0;
+	transform: translateX(100%);
+	width: 100%;
+}
+
+.klientoora-card-modal.is-open {
+	transform: translate(-50%, -50%) scale(1);
+}
+
+.klientoora-card-offcanvas.is-open {
+	transform: translateX(0);
+}
+
+.klientoora-card-modal,
+.klientoora-card-offcanvas {
+	transition: transform 180ms ease;
+}
+
+.klientoora-card-modal h2,
+.klientoora-card-offcanvas h2 {
+	font-size: 30px;
+	line-height: 1.2;
+	margin: 0 0 12px;
+}
+
+.klientoora-card-modal p,
+.klientoora-card-offcanvas p {
+	font-size: 16px;
+	line-height: 1.7;
+	margin: 0 0 20px;
+}
+
+.klientoora-card-member-benefits {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	margin-top: 24px;
+	padding: 18px;
+}
+
+.klientoora-card-member-benefits h3 {
+	font-size: 20px;
+	line-height: 1.3;
+	margin: 0 0 14px;
+}
+
+.klientoora-card-member-benefits__list {
+	display: grid;
+	gap: 10px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.klientoora-card-member-benefits__item {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+}
+
+.klientoora-card-member-benefits__item span {
+	color: #646970;
+}
+
+.klientoora-card-member-benefits__item strong {
+	color: #1d2327;
+	font-size: 18px;
+}
+
+.klientoora-card-member-coupons {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	margin-top: 16px;
+	padding: 18px;
+}
+
+.klientoora-card-member-coupons h3 {
+	font-size: 20px;
+	line-height: 1.3;
+	margin: 0 0 14px;
+}
+
+.klientoora-card-member-coupons__list {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.klientoora-card-member-coupon {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	display: grid;
+	gap: 4px;
+	padding: 12px;
+}
+
+.klientoora-card-member-coupon strong {
+	color: #1d2327;
+	font-size: 16px;
+}
+
+.klientoora-card-member-coupon span {
+	color: #646970;
+}
+
+.klientoora-card-member-coupon small {
+	color: #2271b1;
+	font-weight: 700;
+}
+
+.klientoora-card-member-products {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	margin-top: 16px;
+	padding: 18px;
+}
+
+.klientoora-card-member-products h3 {
+	font-size: 20px;
+	line-height: 1.3;
+	margin: 0 0 14px;
+}
+
+.klientoora-card-member-products__list {
+	display: grid;
+	gap: 12px;
+}
+
+.klientoora-card-member-product {
+	align-items: center;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	display: grid;
+	gap: 12px;
+	grid-template-columns: 76px 1fr;
+	padding: 12px;
+}
+
+.klientoora-card-member-product.is-disabled {
+	background: #f6f7f7;
+	color: #646970;
+	opacity: 0.68;
+}
+
+.klientoora-card-member-product__image {
+	aspect-ratio: 1;
+	background: #f6f7f7;
+	border-radius: 6px;
+	display: block;
+	overflow: hidden;
+}
+
+.klientoora-card-member-product__image img {
+	display: block;
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.klientoora-card-member-product__content {
+	display: grid;
+	gap: 5px;
+}
+
+.klientoora-card-member-product__content strong {
+	color: #1d2327;
+	font-size: 16px;
+	line-height: 1.35;
+}
+
+.klientoora-card-member-product__content span,
+.klientoora-card-member-product__content small {
+	color: #646970;
+}
+
+.klientoora-card-member-product__content .klientoora-card-primary-action {
+	margin-top: 4px;
+	padding: 9px 12px;
+}
+
+.klientoora-card-member-product__disabled {
+	background: #e5e7eb;
+	border-radius: 999px;
+	color: #3c434a;
+	display: inline-block;
+	font-size: 13px;
+	font-weight: 700;
+	justify-self: start;
+	padding: 6px 9px;
+}
+
+.klientoora-card-member-products__notice {
+	background: #ecfdf5;
+	border: 1px solid #bbf7d0;
+	border-radius: 6px;
+	color: #166534;
+	font-size: 14px;
+	font-weight: 700;
+	margin-bottom: 12px;
+	padding: 10px 12px;
+}
+
+.klientoora-card-member-products__notice.is-error {
+	background: #fef2f2;
+	border-color: #fecaca;
+	color: #991b1b;
+}
+
+.klientoora-card-member-orders {
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	margin-top: 16px;
+	padding: 18px;
+}
+
+.klientoora-card-member-orders h3 {
+	font-size: 20px;
+	line-height: 1.3;
+	margin: 0 0 14px;
+}
+
+.klientoora-card-member-orders__summary {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.klientoora-card-member-orders__summary span {
+	color: #646970;
+}
+
+.klientoora-card-member-orders__summary strong {
+	color: #1d2327;
+	font-size: 18px;
+}
+
+.klientoora-card-member-orders__meter {
+	background: #f0f0f1;
+	border-radius: 999px;
+	height: 10px;
+	overflow: hidden;
+}
+
+.klientoora-card-member-orders__meter span {
+	background: #2271b1;
+	display: block;
+	height: 100%;
+}
+
+.klientoora-card-member-orders__steps {
+	display: flex;
+	font-size: 13px;
+	justify-content: space-between;
+	list-style: none;
+	margin: 10px 0 0;
+	padding: 0;
+}
+
+.klientoora-card-member-orders__steps li {
+	color: #646970;
+	max-width: 100%;
+	overflow-wrap: anywhere;
+}
+
+.klientoora-card-member-orders__steps li.is-complete {
+	color: #2271b1;
+	font-weight: 700;
+}
+
+.klientoora-card-modal .klientoora-card-member-orders__stage {
+	color: #646970;
+	font-size: 14px;
+	margin: 12px 0 0;
+}
+
+.klientoora-card-close {
+	align-items: center;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 50%;
+	color: #1d2327;
+	cursor: pointer;
+	display: flex;
+	font-size: 24px;
+	height: 36px;
+	justify-content: center;
+	left: 16px;
+	line-height: 1;
+	padding: 0;
+	position: absolute;
+	top: 16px;
+	width: 36px;
+}
+
+.klientoora-card-close:hover,
+.klientoora-card-close:focus {
+	background: #e5e7eb;
+	outline: 2px solid #2563eb;
+	outline-offset: 2px;
+}
+
+.klientoora-card-actions {
+	display: grid;
+	gap: 10px;
+}
+
+.klientoora-card-primary-action,
+.klientoora-card-secondary-action {
+	border-radius: 6px;
+	box-sizing: border-box;
+	cursor: pointer;
+	display: block;
+	font-weight: 700;
+	line-height: 1.4;
+	padding: 12px 16px;
+	text-align: center;
+	text-decoration: none;
+	width: 100%;
+}
+
+.klientoora-card-primary-action {
+	background: #111827;
+	border: 1px solid #111827;
+	color: #fff;
+}
+
+.klientoora-card-primary-action:hover,
+.klientoora-card-primary-action:focus {
+	background: #2563eb;
+	color: #fff;
+}
+
+.klientoora-card-primary-action:disabled {
+	cursor: wait;
+	opacity: 0.72;
+}
+
+.klientoora-card-secondary-action {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	color: #1d2327;
+}
+
+.klientoora-card-secondary-action:hover,
+.klientoora-card-secondary-action:focus {
+	background: #f6f7f7;
+	color: #1d2327;
+}
+
+.klientoora-card-form {
+	display: grid;
+	gap: 14px;
+	margin-top: 18px;
+}
+
+.klientoora-card-form__field {
+	margin: 0;
+}
+
+.klientoora-card-form__field label {
+	display: block;
+	font-size: 14px;
+	font-weight: 700;
+	margin-bottom: 6px;
+}
+
+.klientoora-card-form__field input {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	box-sizing: border-box;
+	color: #1d2327;
+	font-size: 16px;
+	min-height: 44px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.klientoora-card-form__field input:focus {
+	border-color: #2563eb;
+	box-shadow: 0 0 0 1px #2563eb;
+	outline: none;
+}
+
+.klientoora-card-form__notice {
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.5;
+	padding: 10px 12px;
+}
+
+.klientoora-card-form__notice--error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #991b1b;
+}
+
+.klientoora-card-form__notice--success {
+	background: #ecfdf5;
+	border: 1px solid #bbf7d0;
+	color: #166534;
+}
+
+.klientoora-card-registration-success {
+	display: grid;
+	gap: 14px;
+	margin-top: 18px;
+}
+
+.klientoora-card-registration-success p {
+	margin: 0;
+}
+
+.klientoora-card-checkout-redemption {
+	background: #f8fafc;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	direction: rtl;
+	margin: 0 0 24px;
+	padding: 18px;
+	text-align: right;
+}
+
+.klientoora-card-checkout-redemption-fallback {
+	margin: 0 auto;
+	max-width: 1200px;
+	width: 100%;
+}
+
+.klientoora-card-checkout-redemption h3 {
+	font-size: 20px;
+	line-height: 1.3;
+	margin: 0 0 8px;
+}
+
+.klientoora-card-checkout-redemption p {
+	margin: 0 0 12px;
+}
+
+.klientoora-card-checkout-redemption__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.klientoora-card-checkout-benefits {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	margin-top: 14px;
+}
+
+.klientoora-card-checkout-benefit {
+	align-items: center;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	cursor: pointer;
+	display: grid;
+	gap: 4px 12px;
+	grid-template-columns: 1fr auto;
+	padding: 12px;
+	text-align: right;
+	transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.klientoora-card-checkout-benefit:disabled {
+	cursor: wait;
+	opacity: 0.74;
+}
+
+.klientoora-card-checkout-benefit.is-selected {
+	background: #f0f8f1;
+	border-color: #00a32a;
+}
+
+.klientoora-card-checkout-benefit__title {
+	color: #1d2327;
+	font-weight: 700;
+}
+
+.klientoora-card-checkout-benefit__summary {
+	color: #646970;
+	font-size: 14px;
+}
+
+.klientoora-card-checkout-benefit__state {
+	align-self: center;
+	background: #f6f7f7;
+	border-radius: 999px;
+	color: #1d2327;
+	font-size: 13px;
+	font-weight: 700;
+	grid-column: 2;
+	grid-row: 1 / span 2;
+	padding: 5px 9px;
+}
+
+.klientoora-card-checkout-benefit.is-selected .klientoora-card-checkout-benefit__state {
+	background: #00a32a;
+	color: #fff;
+}
+
+.klientoora-card-checkout-redemption__applied {
+	color: #166534;
+	font-weight: 700;
+}
+
+.klientoora-card-checkout-redemption__notice {
+	background: #ecfdf5;
+	border: 1px solid #bbf7d0;
+	border-radius: 6px;
+	color: #166534;
+	font-size: 14px;
+	font-weight: 700;
+	margin-top: 12px;
+	padding: 10px 12px;
+}
+
+.klientoora-card-checkout-redemption__notice.is-error {
+	background: #fef2f2;
+	border-color: #fecaca;
+	color: #991b1b;
+}
+
+@media (max-width: 600px) {
+	.klientoora-card-floating-button {
+		bottom: 16px;
+		font-size: 13px;
+		height: 112px;
+		inset-inline-end: 16px;
+		width: 112px;
+	}
+
+	.klientoora-card-modal,
+	.klientoora-card-offcanvas {
+		padding: 24px 20px;
+	}
+
+	.klientoora-card-modal h2,
+	.klientoora-card-offcanvas h2 {
+		font-size: 26px;
+	}
+}

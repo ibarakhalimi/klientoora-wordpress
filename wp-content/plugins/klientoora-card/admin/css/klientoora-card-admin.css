@@ -1,0 +1,554 @@
+/**
+ * Admin styles for Klientoora Card.
+ */
+
+.klientoora-card-dashboard {
+	margin-top: 20px;
+}
+
+.klientoora-card-dashboard__stats,
+.klientoora-card-dashboard__grid {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	margin-bottom: 20px;
+}
+
+.klientoora-card-dashboard__card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 16px;
+}
+
+.klientoora-card-dashboard__card h2 {
+	font-size: 16px;
+	margin: 0 0 10px;
+}
+
+.klientoora-card-dashboard__card p {
+	margin: 0;
+}
+
+.klientoora-card-dashboard__value {
+	font-size: 28px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.klientoora-card-coupons {
+	display: grid;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.klientoora-card-members {
+	display: grid;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.klientoora-card-challenges {
+	display: grid;
+	gap: 20px;
+	margin-top: 20px;
+	max-width: 780px;
+}
+
+.klientoora-card-product-redemptions {
+	display: grid;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.klientoora-card-product-redemptions__table {
+	margin-top: 14px;
+}
+
+.klientoora-card-product-redemptions__table th:first-child,
+.klientoora-card-product-redemptions__table td:first-child {
+	width: 150px;
+}
+
+.klientoora-card-product-redemptions__table th:nth-child(4),
+.klientoora-card-product-redemptions__table td:nth-child(4) {
+	width: 140px;
+}
+
+.klientoora-card-orders-management {
+	display: grid;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.klientoora-card-orders-management__table {
+	margin-top: 14px;
+}
+
+.klientoora-card-orders-management__table select {
+	max-width: 180px;
+	width: 100%;
+}
+
+.klientoora-card-orders-board {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(4, minmax(240px, 1fr));
+	margin-top: 14px;
+	overflow-x: auto;
+	padding-bottom: 8px;
+}
+
+.klientoora-card-orders-board__column {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	display: grid;
+	gap: 10px;
+	min-width: 240px;
+	padding: 10px;
+}
+
+.klientoora-card-orders-board__column-header {
+	align-items: center;
+	background: #f6f7f7;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+	padding-bottom: 4px;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+}
+
+.klientoora-card-orders-board__column-header h3 {
+	font-size: 14px;
+	margin: 0;
+}
+
+.klientoora-card-orders-board__column-header span {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 700;
+	min-width: 26px;
+	padding: 3px 8px;
+	text-align: center;
+}
+
+.klientoora-card-orders-board__cards {
+	display: grid;
+	gap: 10px;
+}
+
+.klientoora-card-orders-board__empty,
+.klientoora-card-orders-management__empty {
+	color: #646970;
+	margin: 0;
+}
+
+.klientoora-card-order-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	cursor: pointer;
+	display: grid;
+	gap: 10px;
+	padding: 12px;
+	transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.klientoora-card-order-card:hover,
+.klientoora-card-order-card:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.klientoora-card-order-card__header {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+}
+
+.klientoora-card-order-card__header span {
+	color: #646970;
+	font-size: 12px;
+}
+
+.klientoora-card-order-card__details {
+	display: grid;
+	gap: 7px;
+	margin: 0;
+}
+
+.klientoora-card-order-card__details div {
+	display: grid;
+	gap: 2px;
+}
+
+.klientoora-card-order-card__details dt,
+.klientoora-card-order-card__status span {
+	color: #646970;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.klientoora-card-order-card__details dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.klientoora-card-order-card__status {
+	display: grid;
+	gap: 5px;
+}
+
+.klientoora-card-order-card__status select {
+	width: 100%;
+}
+
+.klientoora-card-order-card__actions {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.klientoora-card-order-card__actions form {
+	margin: 0;
+}
+
+.klientoora-card-order-modal[hidden] {
+	display: none;
+}
+
+.klientoora-card-order-modal-open {
+	overflow: hidden;
+}
+
+.klientoora-card-order-modal__overlay {
+	background: rgba(17, 24, 39, 0.55);
+	inset: 0;
+	position: fixed;
+	z-index: 100000;
+}
+
+.klientoora-card-order-modal__dialog {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+	box-sizing: border-box;
+	color: #1d2327;
+	direction: rtl;
+	left: 50%;
+	max-height: calc(100vh - 48px);
+	max-width: min(760px, calc(100vw - 32px));
+	overflow-y: auto;
+	padding: 24px;
+	position: fixed;
+	text-align: right;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	z-index: 100001;
+}
+
+.klientoora-card-order-modal__close {
+	align-items: center;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 50%;
+	color: #1d2327;
+	cursor: pointer;
+	display: flex;
+	font-size: 24px;
+	height: 34px;
+	justify-content: center;
+	left: 16px;
+	line-height: 1;
+	padding: 0;
+	position: absolute;
+	top: 16px;
+	width: 34px;
+}
+
+.klientoora-card-order-modal__header {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+	padding-inline-end: 44px;
+}
+
+.klientoora-card-order-modal__header h2 {
+	font-size: 24px;
+	margin: 0;
+}
+
+.klientoora-card-order-modal__header span {
+	background: #f0f6fc;
+	border: 1px solid #c5d9ed;
+	border-radius: 999px;
+	color: #135e96;
+	font-weight: 700;
+	padding: 5px 10px;
+}
+
+.klientoora-card-order-modal__details {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin: 18px 0 0;
+}
+
+.klientoora-card-order-modal__details div {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	display: grid;
+	gap: 4px;
+	padding: 10px;
+}
+
+.klientoora-card-order-modal__details dt {
+	color: #646970;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.klientoora-card-order-modal__details dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.klientoora-card-order-modal__products {
+	margin-top: 22px;
+}
+
+.klientoora-card-order-modal__products h3 {
+	font-size: 16px;
+	margin: 0 0 10px;
+}
+
+.klientoora-card-order-modal__product-list {
+	display: grid;
+	gap: 10px;
+}
+
+.klientoora-card-order-modal__product {
+	align-items: center;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	display: grid;
+	gap: 12px;
+	grid-template-columns: 64px 1fr;
+	padding: 10px;
+}
+
+.klientoora-card-order-modal__product-image {
+	aspect-ratio: 1;
+	background: #f6f7f7;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.klientoora-card-order-modal__product-image img {
+	display: block;
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.klientoora-card-order-modal__product-info {
+	display: grid;
+	gap: 4px;
+}
+
+.klientoora-card-order-modal__product-info span {
+	color: #646970;
+}
+
+.klientoora-card-order-modal__footer {
+	align-items: center;
+	border-top: 1px solid #dcdcde;
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 22px;
+	padding-top: 16px;
+}
+
+.klientoora-card-order-modal__footer form {
+	margin: 0;
+}
+
+.klientoora-card-order-modal__complete {
+	color: #646970;
+	font-weight: 700;
+}
+
+.klientoora-card-challenge-card {
+	padding: 18px;
+}
+
+.klientoora-card-challenge-card h2 {
+	margin-bottom: 8px;
+}
+
+.klientoora-card-challenge-card form {
+	margin-top: 16px;
+}
+
+.klientoora-card-challenge-form-grid {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: minmax(160px, 220px) minmax(240px, 1fr);
+}
+
+.klientoora-card-coupon-templates {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.klientoora-card-coupon-template {
+	background: #fff;
+	border: 2px solid #dcdcde;
+	border-radius: 6px;
+	cursor: pointer;
+	display: grid;
+	gap: 8px;
+	padding: 14px;
+	position: relative;
+	text-align: left;
+	transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.klientoora-card-coupon-template strong {
+	color: #1d2327;
+	font-size: 15px;
+}
+
+.klientoora-card-coupon-template span {
+	color: #646970;
+}
+
+.klientoora-card-coupon-template.is-selected {
+	background: #f0f8f1;
+	border-color: #00a32a;
+}
+
+.klientoora-card-coupon-template__selected {
+	background: #00a32a;
+	border-radius: 999px;
+	color: #fff;
+	display: none;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	padding: 5px 8px;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.klientoora-card-coupon-template.is-selected .klientoora-card-coupon-template__selected {
+	display: inline-block;
+}
+
+.klientoora-card-coupon-form-card {
+	padding: 18px;
+}
+
+.klientoora-card-coupon-form-card h2 {
+	margin-bottom: 14px;
+}
+
+.klientoora-card-coupon-form-grid {
+	display: grid;
+	gap: 12px;
+	grid-template-columns: repeat(4, minmax(150px, 1fr));
+}
+
+.klientoora-card-coupon-field {
+	display: grid;
+	gap: 5px;
+}
+
+.klientoora-card-coupon-field--wide {
+	grid-column: span 2;
+}
+
+.klientoora-card-coupon-field label {
+	color: #3c434a;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.klientoora-card-coupon-field input,
+.klientoora-card-coupon-field select,
+.klientoora-card-coupon-field textarea {
+	border-color: #dcdcde;
+	border-radius: 6px;
+	max-width: 100%;
+	min-height: 34px;
+	width: 100%;
+}
+
+.klientoora-card-coupon-field textarea {
+	resize: vertical;
+}
+
+.klientoora-card-coupon-toggles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 14px;
+}
+
+.klientoora-card-coupon-toggles label {
+	align-items: center;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 999px;
+	display: inline-flex;
+	gap: 6px;
+	margin: 0;
+	padding: 7px 10px;
+}
+
+.klientoora-card-coupon-form-actions {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	margin-top: 14px;
+}
+
+.klientoora-card-coupon-actions {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+}
+
+.klientoora-card-coupon-actions form {
+	margin: 0;
+}
+
+@media (max-width: 960px) {
+	.klientoora-card-coupon-form-grid {
+		grid-template-columns: repeat(2, minmax(160px, 1fr));
+	}
+}
+
+@media (max-width: 600px) {
+	.klientoora-card-challenge-form-grid,
+	.klientoora-card-coupon-form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-card-coupon-field--wide {
+		grid-column: auto;
+	}
+}
