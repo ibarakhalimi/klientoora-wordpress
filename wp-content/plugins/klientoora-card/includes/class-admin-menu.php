@@ -819,19 +819,19 @@ class Klientoora_Card_Admin_Menu {
 		$date     = $order->get_date_created()
 			? $order->get_date_created()->date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) )
 			: '-';
+		$edit_url       = $order->get_edit_order_url();
 		$current_status = $this->sanitize_order_status_key( $order->get_meta( self::ORDER_STATUS_META_KEY ) );
-		$modal_id       = 'klientoora-card-order-modal-' . $order_id;
+		$next_status    = $this->get_next_order_status_key( $current_status );
+		$next_label     = $next_status ? $this->get_order_status_options()[ $next_status ] : '';
 		?>
-		<article
-			class="klientoora-card-order-card"
-			role="button"
-			tabindex="0"
-			aria-controls="<?php echo esc_attr( $modal_id ); ?>"
-			data-klientoora-card-open-order-modal
-		>
+		<article class="klientoora-card-order-card">
 			<div class="klientoora-card-order-card__header">
 				<strong>
-					#<?php echo esc_html( (string) $order_id ); ?>
+					<?php if ( $edit_url ) : ?>
+						<a href="<?php echo esc_url( $edit_url ); ?>">#<?php echo esc_html( (string) $order_id ); ?></a>
+					<?php else : ?>
+						#<?php echo esc_html( (string) $order_id ); ?>
+					<?php endif; ?>
 				</strong>
 				<span><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></span>
 			</div>
@@ -842,146 +842,33 @@ class Klientoora_Card_Admin_Menu {
 					<dd><?php echo esc_html( $date ); ?></dd>
 				</div>
 			</dl>
+
+			<div class="klientoora-card-order-card__actions">
+				<?php if ( $next_status ) : ?>
+					<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+						<?php wp_nonce_field( 'klientoora_card_advance_order_status' ); ?>
+						<input type="hidden" name="action" value="klientoora_card_advance_order_status" />
+						<input type="hidden" name="order_id" value="<?php echo esc_attr( $order_id ); ?>" />
+						<?php
+						submit_button(
+							sprintf(
+								/* translators: %s is the next Klientoora order status label. */
+								__( 'העבר ל%s', 'klientoora-card' ),
+								$next_label
+							),
+							'primary small',
+							'submit',
+							false
+						);
+						?>
+					</form>
+				<?php endif; ?>
+
+				<?php if ( $edit_url ) : ?>
+					<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit order', 'klientoora-card' ); ?></a>
+				<?php endif; ?>
+			</div>
 		</article>
-		<?php $this->render_order_management_modal( $order, $modal_id, $current_status ); ?>
-		<?php
-	}
-
-	/**
-	 * Renders an order details modal for the orders board.
-	 *
-	 * @param WC_Order $order          Order object.
-	 * @param string   $modal_id       Modal element ID.
-	 * @param string   $current_status Current Klientoora status key.
-	 *
-	 * @return void
-	 */
-	private function render_order_management_modal( $order, $modal_id, $current_status ) {
-		$order_id       = $order->get_id();
-		$date           = $order->get_date_created()
-			? $order->get_date_created()->date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) )
-			: '-';
-		$customer       = $order->get_formatted_billing_full_name();
-		$next_status    = $this->get_next_order_status_key( $current_status );
-		$next_label     = $next_status ? $this->get_order_status_options()[ $next_status ] : '';
-
-		if ( '' === trim( $customer ) ) {
-			$customer = $order->get_billing_email();
-		}
-		?>
-		<div class="klientoora-card-order-modal" id="<?php echo esc_attr( $modal_id ); ?>" hidden>
-			<div class="klientoora-card-order-modal__overlay" data-klientoora-card-close-order-modal></div>
-			<div
-				class="klientoora-card-order-modal__dialog"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="<?php echo esc_attr( $modal_id . '-title' ); ?>"
-			>
-				<button type="button" class="klientoora-card-order-modal__close" data-klientoora-card-close-order-modal aria-label="<?php echo esc_attr__( 'Close', 'klientoora-card' ); ?>">
-					<span aria-hidden="true">&times;</span>
-				</button>
-
-				<header class="klientoora-card-order-modal__header">
-					<h2 id="<?php echo esc_attr( $modal_id . '-title' ); ?>">#<?php echo esc_html( (string) $order_id ); ?></h2>
-					<span><?php echo esc_html( $this->get_order_status_options()[ $current_status ] ); ?></span>
-				</header>
-
-				<dl class="klientoora-card-order-modal__details">
-					<div>
-						<dt><?php echo esc_html__( 'Date', 'klientoora-card' ); ?></dt>
-						<dd><?php echo esc_html( $date ); ?></dd>
-					</div>
-					<div>
-						<dt><?php echo esc_html__( 'Customer', 'klientoora-card' ); ?></dt>
-						<dd><?php echo esc_html( '' !== $customer ? $customer : '-' ); ?></dd>
-					</div>
-					<div>
-						<dt><?php echo esc_html__( 'Phone', 'klientoora-card' ); ?></dt>
-						<dd><?php echo esc_html( $order->get_billing_phone() ? $order->get_billing_phone() : '-' ); ?></dd>
-					</div>
-					<div>
-						<dt><?php echo esc_html__( 'Email', 'klientoora-card' ); ?></dt>
-						<dd><?php echo esc_html( $order->get_billing_email() ? $order->get_billing_email() : '-' ); ?></dd>
-					</div>
-					<div>
-						<dt><?php echo esc_html__( 'Total', 'klientoora-card' ); ?></dt>
-						<dd><?php echo wp_kses_post( $order->get_formatted_order_total() ); ?></dd>
-					</div>
-					<div>
-						<dt><?php echo esc_html__( 'WooCommerce Status', 'klientoora-card' ); ?></dt>
-						<dd><?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?></dd>
-					</div>
-				</dl>
-
-				<section class="klientoora-card-order-modal__products">
-					<h3><?php echo esc_html__( 'מוצרים בהזמנה', 'klientoora-card' ); ?></h3>
-					<div class="klientoora-card-order-modal__product-list">
-						<?php foreach ( $order->get_items() as $item ) : ?>
-							<?php $this->render_order_modal_product( $item ); ?>
-						<?php endforeach; ?>
-					</div>
-				</section>
-
-				<footer class="klientoora-card-order-modal__footer">
-					<?php if ( $next_status ) : ?>
-						<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
-							<?php wp_nonce_field( 'klientoora_card_advance_order_status' ); ?>
-							<input type="hidden" name="action" value="klientoora_card_advance_order_status" />
-							<input type="hidden" name="order_id" value="<?php echo esc_attr( $order_id ); ?>" />
-							<?php
-							submit_button(
-								sprintf(
-									/* translators: %s is the next Klientoora order status label. */
-									__( 'העבר ל%s', 'klientoora-card' ),
-									$next_label
-								),
-								'primary',
-								'submit',
-								false
-							);
-							?>
-						</form>
-					<?php else : ?>
-						<span class="klientoora-card-order-modal__complete"><?php echo esc_html__( 'ההזמנה הושלמה.', 'klientoora-card' ); ?></span>
-					<?php endif; ?>
-				</footer>
-			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Renders a product row inside an order details modal.
-	 *
-	 * @param WC_Order_Item_Product $item Order item.
-	 *
-	 * @return void
-	 */
-	private function render_order_modal_product( $item ) {
-		$product = $item->get_product();
-		$image   = $product && $product->get_image_id()
-			? wp_get_attachment_image( $product->get_image_id(), 'thumbnail' )
-			: ( function_exists( 'wc_placeholder_img' ) ? wc_placeholder_img( 'thumbnail' ) : '' );
-		?>
-		<div class="klientoora-card-order-modal__product">
-			<div class="klientoora-card-order-modal__product-image">
-				<?php echo wp_kses_post( $image ); ?>
-			</div>
-			<div class="klientoora-card-order-modal__product-info">
-				<strong><?php echo esc_html( $item->get_name() ); ?></strong>
-				<span>
-					<?php
-					echo esc_html(
-						sprintf(
-							/* translators: %d is the ordered product quantity. */
-							__( 'Quantity: %d', 'klientoora-card' ),
-							absint( $item->get_quantity() )
-						)
-					);
-					?>
-				</span>
-			</div>
-		</div>
 		<?php
 	}
 
