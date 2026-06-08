@@ -129,6 +129,1222 @@ body.klientoora-admin-main {
 	margin: 0;
 }
 
+.klientoora-admin-main-orders {
+	display: grid;
+	gap: 22px;
+}
+
+.klientoora-admin-main-orders__header {
+	align-items: end;
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.klientoora-admin-main-orders__header p {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	margin: 6px 0 0;
+}
+
+.klientoora-admin-main-orders__toolbar {
+	align-items: center;
+	display: flex;
+	gap: 12px;
+	min-height: 44px;
+}
+
+.klientoora-admin-main__toast {
+	align-items: center;
+	background: #0f766e;
+	border: 1px solid #14b8a6;
+	border-radius: 8px;
+	box-shadow: 0 18px 44px rgb(15 23 42 / 18%);
+	color: #fff;
+	display: flex;
+	font-size: 14px;
+	font-weight: 800;
+	gap: 14px;
+	inset-block-end: 24px;
+	inset-inline-start: 50%;
+	justify-content: space-between;
+	max-width: min(420px, calc(100vw - 36px));
+	min-height: 52px;
+	padding: 12px 14px;
+	position: fixed;
+	transform: translateX(-50%);
+	transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+	width: max-content;
+	z-index: 1000;
+}
+
+.klientoora-admin-main__toast.is-error {
+	background: #dc2626;
+	border-color: #f87171;
+}
+
+.klientoora-admin-main__toast.is-dismissing {
+	opacity: 0;
+	transform: translateX(-50%) translateY(8px);
+	visibility: hidden;
+}
+
+.klientoora-admin-main__toast button {
+	align-items: center;
+	background: rgb(255 255 255 / 16%);
+	border: 1px solid rgb(255 255 255 / 35%);
+	border-radius: 8px;
+	color: #fff;
+	cursor: pointer;
+	display: inline-flex;
+	font: inherit;
+	font-size: 20px;
+	font-weight: 400;
+	height: 32px;
+	justify-content: center;
+	line-height: 1;
+	padding: 0;
+	width: 32px;
+}
+
+.klientoora-admin-main-orders__status-filter {
+	position: relative;
+}
+
+.klientoora-admin-main-orders__status-filter-button {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #172033;
+	cursor: pointer;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 14px;
+}
+
+.klientoora-admin-main-orders__status-filter-panel {
+	background: #fff;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	box-shadow: 0 18px 40px rgb(15 23 42 / 14%);
+	display: grid;
+	gap: 10px;
+	min-width: 210px;
+	opacity: 0;
+	padding: 12px;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: calc(100% + 8px);
+	transform: translateY(-4px);
+	transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+	visibility: hidden;
+	z-index: 20;
+}
+
+.klientoora-admin-main-orders__status-filter:hover .klientoora-admin-main-orders__status-filter-panel,
+.klientoora-admin-main-orders__status-filter:focus-within .klientoora-admin-main-orders__status-filter-panel {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0);
+	visibility: visible;
+}
+
+.klientoora-admin-main-orders__status-filter-panel label {
+	align-items: center;
+	color: #172033;
+	cursor: pointer;
+	display: flex;
+	font-size: 14px;
+	font-weight: 700;
+	gap: 8px;
+}
+
+.klientoora-admin-main-orders__status-filter-panel input {
+	accent-color: #0f766e;
+}
+
+.klientoora-admin-main-orders__summary {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.klientoora-admin-main-orders__summary-item {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 10px;
+	min-height: 104px;
+	padding: 16px;
+}
+
+.klientoora-admin-main-orders__summary-item span {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-orders__summary-item strong {
+	color: #0f172a;
+	font-size: 34px;
+	line-height: 1;
+}
+
+.klientoora-admin-main-orders__section-block {
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 16px;
+	padding: 16px;
+}
+
+.klientoora-admin-main-orders__section-block h3 {
+	color: #0f172a;
+	font-size: 20px;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.klientoora-admin-main-orders__board {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	overflow-x: auto;
+	padding-bottom: 4px;
+}
+
+.klientoora-admin-main-orders__column {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 14px;
+	min-width: 240px;
+	padding: 14px;
+}
+
+.klientoora-admin-main-orders__column.is-hidden,
+.klientoora-admin-main-orders__column[hidden] {
+	display: none !important;
+}
+
+.klientoora-admin-main-orders__column-header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.klientoora-admin-main-orders__column-header h3,
+.klientoora-admin-main-orders__column-header h4 {
+	color: #0f172a;
+	font-size: 16px;
+	line-height: 1.3;
+	margin: 0;
+}
+
+.klientoora-admin-main-orders__column-header span {
+	align-items: center;
+	background: #e2e8f0;
+	border-radius: 999px;
+	color: #334155;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 800;
+	height: 28px;
+	justify-content: center;
+	min-width: 28px;
+	padding: 0 9px;
+}
+
+.klientoora-admin-main-orders__cards {
+	display: grid;
+	gap: 12px;
+}
+
+.klientoora-admin-main-orders__empty {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	margin: 0;
+}
+
+.klientoora-admin-main-order-card {
+	background: #fff;
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	cursor: pointer;
+	display: grid;
+	gap: 14px;
+	padding: 14px;
+}
+
+.klientoora-admin-main-order-card:hover,
+.klientoora-admin-main-order-card:focus {
+	border-color: #99f6e4;
+	box-shadow: 0 12px 28px rgb(15 23 42 / 10%);
+	outline: none;
+}
+
+.klientoora-admin-main-order-card__header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.klientoora-admin-main-order-card__header strong,
+.klientoora-admin-main-order-card__header a {
+	color: #0f172a;
+	font-size: 16px;
+}
+
+.klientoora-admin-main-order-card__header span {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-order-card__details {
+	display: grid;
+	gap: 10px;
+	margin: 0;
+}
+
+.klientoora-admin-main-order-card__details div {
+	display: grid;
+	gap: 2px;
+}
+
+.klientoora-admin-main-order-card__details dt {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-order-card__details dd {
+	color: #172033;
+	font-size: 14px;
+	margin: 0;
+}
+
+.klientoora-admin-main-order-dialog {
+	background: transparent;
+	border: 0;
+	margin: auto;
+	max-height: min(860px, 92vh);
+	max-width: min(980px, calc(100vw - 34px));
+	padding: 0;
+	width: 100%;
+}
+
+.klientoora-admin-main-order-dialog::backdrop {
+	background: rgb(15 23 42 / 48%);
+}
+
+.klientoora-admin-main-order-dialog__surface {
+	background: #fff;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	box-shadow: 0 24px 80px rgb(15 23 42 / 26%);
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr) auto;
+	max-height: min(860px, 92vh);
+	overflow: hidden;
+}
+
+.klientoora-admin-main-order-dialog__header,
+.klientoora-admin-main-order-dialog__footer {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 18px 20px;
+}
+
+.klientoora-admin-main-order-dialog__header {
+	border-bottom: 1px solid #e5edf5;
+}
+
+.klientoora-admin-main-order-dialog__header p {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+	margin: 0 0 4px;
+}
+
+.klientoora-admin-main-order-dialog__header h3 {
+	color: #0f172a;
+	font-size: 24px;
+	line-height: 1.2;
+	margin: 0;
+}
+
+.klientoora-admin-main-order-dialog__close {
+	align-items: center;
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #334155;
+	cursor: pointer;
+	display: inline-flex;
+	font-size: 26px;
+	font-weight: 400;
+	height: 40px;
+	justify-content: center;
+	line-height: 1;
+	width: 40px;
+}
+
+.klientoora-admin-main-order-dialog__body {
+	display: grid;
+	gap: 16px;
+	overflow: auto;
+	padding: 20px;
+}
+
+.klientoora-admin-main-order-dialog__section {
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.klientoora-admin-main-order-dialog__section[open],
+.klientoora-admin-main-order-dialog__item-group[open],
+.klientoora-admin-main-order-dialog__item[open] {
+	display: grid;
+	gap: 12px;
+}
+
+.klientoora-admin-main-order-dialog__section summary,
+.klientoora-admin-main-order-dialog__item-group summary,
+.klientoora-admin-main-order-dialog__item summary {
+	align-items: center;
+	color: #0f172a;
+	cursor: pointer;
+	display: flex;
+	font-weight: 800;
+	justify-content: space-between;
+	gap: 12px;
+	line-height: 1.25;
+	list-style: none;
+}
+
+.klientoora-admin-main-order-dialog__section summary {
+	font-size: 17px;
+}
+
+.klientoora-admin-main-order-dialog__item-group summary {
+	font-size: 15px;
+}
+
+.klientoora-admin-main-order-dialog__item summary {
+	font-size: 14px;
+}
+
+.klientoora-admin-main-order-dialog__section summary::-webkit-details-marker,
+.klientoora-admin-main-order-dialog__item-group summary::-webkit-details-marker,
+.klientoora-admin-main-order-dialog__item summary::-webkit-details-marker {
+	display: none;
+}
+
+.klientoora-admin-main-order-dialog__section summary::after,
+.klientoora-admin-main-order-dialog__item-group summary::after,
+.klientoora-admin-main-order-dialog__item summary::after {
+	color: #64748b;
+	content: "+";
+	font-size: 18px;
+	line-height: 1;
+}
+
+.klientoora-admin-main-order-dialog__section[open] > summary::after,
+.klientoora-admin-main-order-dialog__item-group[open] > summary::after,
+.klientoora-admin-main-order-dialog__item[open] > summary::after {
+	content: "-";
+}
+
+.klientoora-admin-main-order-dialog__fields,
+.klientoora-admin-main-order-dialog__nested-fields {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+}
+
+.klientoora-admin-main-order-dialog__fields {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-order-dialog__fields > div,
+.klientoora-admin-main-order-dialog__nested-fields > div {
+	background: #f8fafc;
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	display: grid;
+	gap: 4px;
+	min-width: 0;
+	padding: 10px;
+}
+
+.klientoora-admin-main-order-dialog__fields dt,
+.klientoora-admin-main-order-dialog__nested-fields dt {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-order-dialog__fields dd,
+.klientoora-admin-main-order-dialog__nested-fields dd {
+	color: #172033;
+	font-size: 13px;
+	margin: 0;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.klientoora-admin-main-order-dialog__nested-fields {
+	gap: 6px;
+}
+
+.klientoora-admin-main-order-dialog__nested-fields > div {
+	background: #fff;
+	padding: 8px;
+}
+
+.klientoora-admin-main-order-dialog__item-groups {
+	display: grid;
+	gap: 14px;
+}
+
+.klientoora-admin-main-order-dialog__item-group,
+.klientoora-admin-main-order-dialog__item {
+	display: grid;
+	gap: 10px;
+}
+
+.klientoora-admin-main-order-dialog__item {
+	background: #f8fafc;
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	padding: 12px;
+}
+
+.klientoora-admin-main-order-dialog__item-group {
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	padding: 12px;
+}
+
+.klientoora-admin-main-order-dialog__footer {
+	border-top: 1px solid #e5edf5;
+}
+
+.klientoora-admin-main-order-dialog__advance,
+.klientoora-admin-main-order-dialog__complete {
+	align-items: center;
+	border-radius: 8px;
+	display: inline-flex;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 14px;
+}
+
+.klientoora-admin-main-order-dialog__advance {
+	background: #ccfbf1;
+	border: 1px solid #99f6e4;
+	color: #0f766e;
+	cursor: pointer;
+}
+
+.klientoora-admin-main-order-dialog__complete {
+	background: #f1f5f9;
+	border: 1px solid #cbd5e1;
+	color: #475569;
+}
+
+.klientoora-admin-main-members {
+	display: grid;
+	gap: 22px;
+}
+
+.klientoora-admin-main-members__header {
+	align-items: end;
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.klientoora-admin-main-members__header p {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	margin: 6px 0 0;
+}
+
+.klientoora-admin-main-members__stats {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-members__stat {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 8px;
+	min-height: 110px;
+	padding: 18px;
+}
+
+.klientoora-admin-main-members__stat span {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-members__stat strong {
+	color: #0f172a;
+	font-size: 34px;
+	line-height: 1;
+}
+
+.klientoora-admin-main-members__table-wrap {
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	overflow-x: auto;
+}
+
+.klientoora-admin-main-members__table {
+	border-collapse: collapse;
+	min-width: 980px;
+	width: 100%;
+}
+
+.klientoora-admin-main-members__table th,
+.klientoora-admin-main-members__table td {
+	border-bottom: 1px solid #e5edf5;
+	padding: 13px 14px;
+	text-align: right;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.klientoora-admin-main-members__table th {
+	background: #f8fafc;
+	color: #475569;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-members__table td {
+	color: #172033;
+	font-size: 14px;
+}
+
+.klientoora-admin-main-members__table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.klientoora-admin-main-members__table a {
+	color: #0f766e;
+	font-weight: 700;
+}
+
+.klientoora-admin-main-members__action {
+	align-items: center;
+	border: 1px solid #99f6e4;
+	border-radius: 8px;
+	display: inline-flex;
+	min-height: 34px;
+	padding: 6px 10px;
+}
+
+.klientoora-admin-main-club-activity {
+	display: grid;
+	gap: 22px;
+}
+
+.klientoora-admin-main-club-activity__header {
+	align-items: end;
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.klientoora-admin-main-club-activity__header p {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	margin: 6px 0 0;
+}
+
+.klientoora-admin-main-club-activity__tabs {
+	align-items: center;
+	border-bottom: 1px solid #d9e1ea;
+	display: flex;
+	gap: 8px;
+	overflow-x: auto;
+	padding-bottom: 10px;
+}
+
+.klientoora-admin-main-club-activity__tabs button {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	color: #475569;
+	cursor: pointer;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 14px;
+	white-space: nowrap;
+}
+
+.klientoora-admin-main-club-activity__tabs button.is-active {
+	background: #0f766e;
+	border-color: #0f766e;
+	color: #fff;
+}
+
+.klientoora-admin-main-club-activity__panel {
+	display: grid;
+	gap: 16px;
+}
+
+.klientoora-admin-main-club-activity__panel[hidden] {
+	display: none !important;
+}
+
+.klientoora-admin-main-club-activity__section-heading {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 14px;
+}
+
+.klientoora-admin-main-club-activity__section-heading h3 {
+	color: #0f172a;
+	font-size: 20px;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.klientoora-admin-main-club-activity__section-heading span {
+	align-items: center;
+	background: #e2e8f0;
+	border-radius: 999px;
+	color: #334155;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 800;
+	height: 28px;
+	justify-content: center;
+	min-width: 28px;
+	padding: 0 9px;
+}
+
+.klientoora-admin-main-club-activity__table-wrap {
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	overflow-x: auto;
+}
+
+.klientoora-admin-main-club-activity__table {
+	border-collapse: collapse;
+	min-width: 860px;
+	width: 100%;
+}
+
+.klientoora-admin-main-club-activity__table th,
+.klientoora-admin-main-club-activity__table td {
+	border-bottom: 1px solid #e5edf5;
+	padding: 13px 14px;
+	text-align: right;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.klientoora-admin-main-club-activity__table th {
+	background: #f8fafc;
+	color: #475569;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-club-activity__table td {
+	color: #172033;
+	font-size: 14px;
+}
+
+.klientoora-admin-main-club-activity__table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.klientoora-admin-main-coupons-bank {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-member-discount {
+	align-items: end;
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 18px;
+	grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+	margin-bottom: 18px;
+	padding: 18px;
+}
+
+.klientoora-admin-main-member-discount h3 {
+	color: #0f172a;
+	font-size: 18px;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.klientoora-admin-main-member-discount p {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.5;
+	margin: 8px 0 0;
+	max-width: 720px;
+}
+
+.klientoora-admin-main-member-discount form {
+	display: grid;
+	gap: 8px;
+}
+
+.klientoora-admin-main-member-discount label {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-member-discount__control {
+	align-items: center;
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	min-height: 42px;
+	overflow: hidden;
+}
+
+.klientoora-admin-main-member-discount__control input {
+	background: transparent;
+	border: 0;
+	color: #172033;
+	font: inherit;
+	min-height: 42px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.klientoora-admin-main-member-discount__control span {
+	color: #64748b;
+	font-weight: 800;
+	padding: 0 12px;
+}
+
+.klientoora-admin-main-member-discount button {
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	min-height: 42px;
+	padding: 8px 14px;
+}
+
+.klientoora-admin-main-coupon-card {
+	min-width: 0;
+}
+
+.klientoora-admin-main-coupon-card button {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	color: #172033;
+	cursor: pointer;
+	display: grid;
+	font: inherit;
+	gap: 12px;
+	min-height: 150px;
+	padding: 16px;
+	text-align: right;
+	width: 100%;
+}
+
+.klientoora-admin-main-coupon-card button:hover,
+.klientoora-admin-main-coupon-card button:focus {
+	border-color: #99f6e4;
+	box-shadow: 0 12px 28px rgb(15 23 42 / 10%);
+	outline: none;
+}
+
+.klientoora-admin-main-coupon-card.is-active button {
+	background: #ecfdf5;
+	border-color: #5eead4;
+}
+
+.klientoora-admin-main-coupon-card__status {
+	align-items: center;
+	background: #e2e8f0;
+	border-radius: 999px;
+	color: #334155;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 800;
+	justify-content: center;
+	justify-self: start;
+	min-height: 28px;
+	padding: 4px 10px;
+}
+
+.klientoora-admin-main-coupon-card.is-active .klientoora-admin-main-coupon-card__status {
+	background: #0f766e;
+	color: #fff;
+}
+
+.klientoora-admin-main-coupon-card strong {
+	color: #0f172a;
+	font-size: 18px;
+	line-height: 1.25;
+}
+
+.klientoora-admin-main-coupon-card span {
+	font-size: 14px;
+}
+
+.klientoora-admin-main-coupon-card__meta {
+	display: grid;
+	gap: 8px;
+}
+
+.klientoora-admin-main-coupon-card__meta span {
+	background: #fff;
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	display: grid;
+	gap: 3px;
+	min-width: 0;
+	padding: 9px;
+}
+
+.klientoora-admin-main-coupon-card__meta b {
+	color: #64748b;
+	font-size: 11px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-coupon-dialog {
+	background: transparent;
+	border: 0;
+	margin: auto;
+	max-height: min(760px, 92vh);
+	max-width: min(820px, calc(100vw - 34px));
+	padding: 0;
+	width: 100%;
+}
+
+.klientoora-admin-main-coupon-dialog::backdrop {
+	background: rgb(15 23 42 / 48%);
+}
+
+.klientoora-admin-main-coupon-dialog__surface {
+	background: #fff;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	box-shadow: 0 24px 80px rgb(15 23 42 / 26%);
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr) auto;
+	max-height: min(760px, 92vh);
+	overflow: hidden;
+}
+
+.klientoora-admin-main-coupon-dialog__header,
+.klientoora-admin-main-coupon-dialog__footer {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 18px 20px;
+}
+
+.klientoora-admin-main-coupon-dialog__header {
+	border-bottom: 1px solid #e5edf5;
+}
+
+.klientoora-admin-main-coupon-dialog__header p {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+	margin: 0 0 4px;
+}
+
+.klientoora-admin-main-coupon-dialog__header h3 {
+	color: #0f172a;
+	font-size: 24px;
+	line-height: 1.2;
+	margin: 0;
+}
+
+.klientoora-admin-main-coupon-dialog__header button {
+	align-items: center;
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #334155;
+	cursor: pointer;
+	display: inline-flex;
+	font-size: 26px;
+	font-weight: 400;
+	height: 40px;
+	justify-content: center;
+	line-height: 1;
+	width: 40px;
+}
+
+.klientoora-admin-main-coupon-dialog__form {
+	overflow: auto;
+	padding: 20px;
+}
+
+.klientoora-admin-main-coupon-dialog__grid {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-coupon-dialog__grid div {
+	display: grid;
+	gap: 6px;
+}
+
+.klientoora-admin-main-coupon-dialog__grid .is-wide {
+	grid-column: 1 / -1;
+}
+
+.klientoora-admin-main-coupon-dialog__grid label {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-coupon-dialog__grid input,
+.klientoora-admin-main-coupon-dialog__grid select,
+.klientoora-admin-main-coupon-dialog__grid textarea {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #172033;
+	font: inherit;
+	min-height: 40px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.klientoora-admin-main-coupon-dialog__checks {
+	align-items: center;
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.klientoora-admin-main-coupon-dialog__checks label {
+	align-items: center;
+	color: #172033;
+	display: inline-flex;
+	gap: 7px;
+}
+
+.klientoora-admin-main-coupon-dialog__checks input {
+	min-height: 0;
+	width: auto;
+}
+
+.klientoora-admin-main-coupon-dialog__footer {
+	border-top: 1px solid #e5edf5;
+}
+
+.klientoora-admin-main-coupon-dialog__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.klientoora-admin-main-coupon-dialog__footer button {
+	border-radius: 8px;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 14px;
+}
+
+.klientoora-admin-main-coupon-dialog__actions button[type="submit"] {
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	color: #fff;
+}
+
+.klientoora-admin-main-coupon-dialog__actions button[type="button"] {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	color: #334155;
+}
+
+.klientoora-admin-main-coupon-dialog__footer .is-danger {
+	background: #fee2e2;
+	border: 1px solid #fecaca;
+	color: #b91c1c;
+}
+
+.klientoora-admin-main-coupons-manual {
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.klientoora-admin-main-coupons-manual[open] {
+	display: grid;
+	gap: 16px;
+}
+
+.klientoora-admin-main-coupons-manual summary {
+	color: #0f172a;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 800;
+	list-style: none;
+}
+
+.klientoora-admin-main-coupons-manual summary::-webkit-details-marker {
+	display: none;
+}
+
+.klientoora-admin-main-coupon-manual-form {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-coupon-manual-form div {
+	display: grid;
+	gap: 6px;
+}
+
+.klientoora-admin-main-coupon-manual-form .is-wide {
+	grid-column: 1 / -1;
+}
+
+.klientoora-admin-main-coupon-manual-form label {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-coupon-manual-form input,
+.klientoora-admin-main-coupon-manual-form select,
+.klientoora-admin-main-coupon-manual-form textarea {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #172033;
+	font: inherit;
+	min-height: 40px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.klientoora-admin-main-coupon-manual-form__checks {
+	align-items: center;
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.klientoora-admin-main-coupon-manual-form__checks label {
+	align-items: center;
+	color: #172033;
+	display: inline-flex;
+	gap: 7px;
+}
+
+.klientoora-admin-main-coupon-manual-form__checks input {
+	min-height: 0;
+	width: auto;
+}
+
+.klientoora-admin-main-coupon-manual-form button {
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	min-height: 42px;
+	padding: 8px 14px;
+}
+
+.klientoora-admin-main-club-activity__stats {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-club-activity__stat {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 10px;
+	min-height: 112px;
+	padding: 18px;
+}
+
+.klientoora-admin-main-club-activity__stat span {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+	.klientoora-admin-main-club-activity__stat strong {
+		color: #0f172a;
+		font-size: 24px;
+		line-height: 1.25;
+	}
+
+	.klientoora-admin-main-club-activity__empty {
+		color: #64748b;
+		font-size: 14px;
+		font-weight: 700;
+		margin: 0;
+	}
+
+@media (max-width: 1100px) {
+	.klientoora-admin-main-coupons-bank {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 @media (max-width: 820px) {
 	.klientoora-admin-main__shell {
 		grid-template-columns: 1fr;
@@ -154,5 +1370,39 @@ body.klientoora-admin-main {
 	.klientoora-admin-main__content {
 		padding-left: 18px;
 		padding-right: 18px;
+	}
+
+	.klientoora-admin-main-members__stats {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-orders__board {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 260px));
+	}
+
+	.klientoora-admin-main-order-dialog__fields {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-club-activity__stats {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-member-discount {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-coupons-bank {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-coupon-dialog__grid,
+	.klientoora-admin-main-coupon-manual-form {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-coupon-dialog__footer {
+		align-items: stretch;
+		flex-direction: column;
 	}
 }

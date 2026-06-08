@@ -82,6 +82,7 @@ class Klientoora_Card {
 		$this->loader->add_action( 'admin_post_klientoora_card_test_points_sync', $admin_menu, 'handle_test_points_sync' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_coupon', $admin_menu, 'handle_save_coupon' );
 		$this->loader->add_action( 'admin_post_klientoora_card_delete_coupon', $admin_menu, 'handle_delete_coupon' );
+		$this->loader->add_action( 'admin_post_klientoora_card_save_member_discount', $admin_menu, 'handle_save_member_discount' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_product_redemptions', $admin_menu, 'handle_save_product_redemptions' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_order_statuses', $admin_menu, 'handle_save_order_statuses' );
 		$this->loader->add_action( 'admin_post_klientoora_card_advance_order_status', $admin_menu, 'handle_advance_order_status' );
