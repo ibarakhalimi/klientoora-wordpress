@@ -26,6 +26,7 @@ define( 'KLIENTOORA_CARD_BASENAME', plugin_basename( __FILE__ ) );
 
 require_once KLIENTOORA_CARD_PATH . 'includes/class-klientoora-card-activator.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-klientoora-card-deactivator.php';
+require_once KLIENTOORA_CARD_PATH . 'includes/class-admin-main-page.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-admin-menu.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-checkout-redemption.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-coupon-validation.php';

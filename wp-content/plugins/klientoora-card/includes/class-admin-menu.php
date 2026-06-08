@@ -85,6 +85,15 @@ class Klientoora_Card_Admin_Menu {
 			'loyalty-club-orders-management',
 			array( $this, 'render_orders_management_page' )
 		);
+
+		add_submenu_page(
+			'loyalty-club',
+			__( 'Product Managment', 'klientoora-card' ),
+			__( 'Product Managment', 'klientoora-card' ),
+			'manage_options',
+			'loyalty-club-product-management',
+			array( $this, 'render_product_management_page' )
+		);
 	}
 
 	/**
@@ -476,6 +485,61 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
+	 * Renders the product management page.
+	 *
+	 * @return void
+	 */
+	public function render_product_management_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$products = class_exists( 'Klientoora_Card_Product_Redemption' ) ? Klientoora_Card_Product_Redemption::get_admin_products() : array();
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html__( 'Product Managment', 'klientoora-card' ); ?></h1>
+
+			<?php if ( ! function_exists( 'wc_get_products' ) ) : ?>
+				<div class="notice notice-error">
+					<p><?php echo esc_html__( 'WooCommerce is not active. Product management is disabled until WooCommerce is available.', 'klientoora-card' ); ?></p>
+				</div>
+			<?php else : ?>
+				<div class="klientoora-card-product-management">
+					<div class="klientoora-card-dashboard__card">
+						<h2><?php echo esc_html__( 'כל המוצרים', 'klientoora-card' ); ?></h2>
+
+						<table class="widefat striped klientoora-card-product-management__table">
+							<thead>
+								<tr>
+									<th><?php echo esc_html__( 'מוצר', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'מחיר רגיל', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'סטטוס', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'מלאי', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'ניתן לרכישה בנקודות', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'שווי נקודות', 'klientoora-card' ); ?></th>
+									<th><?php echo esc_html__( 'Actions', 'klientoora-card' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if ( empty( $products ) ) : ?>
+									<tr>
+										<td colspan="7"><?php echo esc_html__( 'No products found.', 'klientoora-card' ); ?></td>
+									</tr>
+								<?php else : ?>
+									<?php foreach ( $products as $product ) : ?>
+										<?php $this->render_product_management_row( $product ); ?>
+									<?php endforeach; ?>
+								<?php endif; ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Handles saving Klientoora statuses from the orders management page.
 	 *
 	 * @return void
@@ -783,6 +847,58 @@ class Klientoora_Card_Admin_Menu {
 		);
 
 		return is_array( $orders ) ? $orders : array();
+	}
+
+	/**
+	 * Renders a product management table row.
+	 *
+	 * @param WC_Product $product Product object.
+	 *
+	 * @return void
+	 */
+	private function render_product_management_row( $product ) {
+		$product_id     = $product->get_id();
+		$edit_url       = get_edit_post_link( $product_id );
+		$image_id       = $product->get_image_id();
+		$image          = $image_id ? wp_get_attachment_image( $image_id, 'thumbnail' ) : ( function_exists( 'wc_placeholder_img' ) ? wc_placeholder_img( 'thumbnail' ) : '' );
+		$points_enabled = 'yes' === get_post_meta( $product_id, Klientoora_Card_Product_Redemption::META_ENABLED, true );
+		$points_price   = Klientoora_Card_Product_Redemption::get_product_points_price( $product );
+		$stock_status   = function_exists( 'wc_get_product_stock_status_options' )
+			? wc_get_product_stock_status_options()
+			: array();
+		$stock_label    = isset( $stock_status[ $product->get_stock_status() ] )
+			? $stock_status[ $product->get_stock_status() ]
+			: $product->get_stock_status();
+		?>
+		<tr>
+			<td>
+				<div class="klientoora-card-product-management__product">
+					<span class="klientoora-card-product-management__image"><?php echo wp_kses_post( $image ); ?></span>
+					<strong>
+						<?php if ( $edit_url ) : ?>
+							<a href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( $product->get_name() ); ?></a>
+						<?php else : ?>
+							<?php echo esc_html( $product->get_name() ); ?>
+						<?php endif; ?>
+					</strong>
+				</div>
+			</td>
+			<td><?php echo wp_kses_post( $product->get_price_html() ? $product->get_price_html() : '-' ); ?></td>
+			<td><?php echo esc_html( $product->get_status() ); ?></td>
+			<td><?php echo esc_html( $stock_label ); ?></td>
+			<td>
+				<span class="klientoora-card-product-management__badge <?php echo esc_attr( $points_enabled ? 'is-enabled' : 'is-disabled' ); ?>">
+					<?php echo esc_html( $points_enabled ? __( 'כן', 'klientoora-card' ) : __( 'לא', 'klientoora-card' ) ); ?>
+				</span>
+			</td>
+			<td><?php echo esc_html( 0 < $points_price ? number_format_i18n( $points_price ) : '-' ); ?></td>
+			<td>
+				<?php if ( $edit_url ) : ?>
+					<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit product', 'klientoora-card' ); ?></a>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<?php
 	}
 
 	/**

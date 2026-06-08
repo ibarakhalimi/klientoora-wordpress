@@ -104,6 +104,10 @@ class Klientoora_Card_Public {
 	 * @return void
 	 */
 	public function render_floating_club_button() {
+		if ( '1' === (string) get_query_var( 'klientoora_admin_main' ) ) {
+			return;
+		}
+
 		$is_account_page = function_exists( 'is_account_page' ) && is_account_page();
 
 		if ( ! is_front_page() && ! $is_account_page ) {

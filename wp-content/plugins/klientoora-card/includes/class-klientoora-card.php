@@ -104,6 +104,7 @@ class Klientoora_Card {
 	 */
 	private function define_public_hooks() {
 		$plugin_public       = new Klientoora_Card_Public( $this->get_plugin_name(), $this->get_version() );
+		$admin_main_page     = new Klientoora_Card_Admin_Main_Page();
 		$coupon_validation   = new Klientoora_Card_Coupon_Validation();
 		$checkout_redemption = new Klientoora_Card_Checkout_Redemption();
 		$order_points        = new Klientoora_Card_Order_Points();
@@ -112,6 +113,11 @@ class Klientoora_Card {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'init', $admin_main_page, 'register_rewrite_rule' );
+		$this->loader->add_filter( 'query_vars', $admin_main_page, 'register_query_var' );
+		$this->loader->add_filter( 'template_include', $admin_main_page, 'load_template' );
+		$this->loader->add_action( 'wp_enqueue_scripts', $admin_main_page, 'enqueue_assets' );
+		$this->loader->add_filter( 'show_admin_bar', $admin_main_page, 'hide_admin_bar' );
 		$this->loader->add_action( 'wp_footer', $plugin_public, 'render_floating_club_button' );
 		$this->loader->add_action( 'admin_post_nopriv_klientoora_card_register_member', $plugin_public, 'handle_member_registration' );
 		$this->loader->add_action( 'admin_post_klientoora_card_register_member', $plugin_public, 'handle_member_registration' );
