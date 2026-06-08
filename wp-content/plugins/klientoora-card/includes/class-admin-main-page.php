@@ -63,11 +63,14 @@ class Klientoora_Card_Admin_Main_Page {
 			return;
 		}
 
+		$css_path = KLIENTOORA_CARD_PATH . 'assets/css/admin-main.css';
+		$js_path  = KLIENTOORA_CARD_PATH . 'assets/js/admin-main.js';
+
 		wp_enqueue_style(
 			'klientoora-card-admin-main',
 			KLIENTOORA_CARD_URL . 'assets/css/admin-main.css',
 			array(),
-			KLIENTOORA_CARD_VERSION,
+			file_exists( $css_path ) ? filemtime( $css_path ) : KLIENTOORA_CARD_VERSION,
 			'all'
 		);
 
@@ -75,7 +78,7 @@ class Klientoora_Card_Admin_Main_Page {
 			'klientoora-card-admin-main',
 			KLIENTOORA_CARD_URL . 'assets/js/admin-main.js',
 			array(),
-			KLIENTOORA_CARD_VERSION,
+			file_exists( $js_path ) ? filemtime( $js_path ) : KLIENTOORA_CARD_VERSION,
 			true
 		);
 	}

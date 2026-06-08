@@ -30,6 +30,7 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 			<nav class="klientoora-admin-main__nav">
 				<a class="is-active" href="#dashboard"><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></a>
 				<a href="#orders"><?php echo esc_html__( 'הזמנות', 'klientoora-card' ); ?></a>
+				<a href="#products"><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></a>
 				<a href="#members"><?php echo esc_html__( 'לקוחות', 'klientoora-card' ); ?></a>
 				<a href="#club-activity"><?php echo esc_html__( 'פעילות מועדון', 'klientoora-card' ); ?></a>
 				<a href="#settings"><?php echo esc_html__( 'הגדרות', 'klientoora-card' ); ?></a>
@@ -53,12 +54,20 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 					<?php $klientoora_admin_menu->render_orders_admin_main_view(); ?>
 				</section>
 
+				<section class="klientoora-admin-main__panel" id="products-panel" data-klientoora-admin-main-panel="products" hidden>
+					<?php $klientoora_admin_menu->render_products_admin_main_view(); ?>
+				</section>
+
 				<section class="klientoora-admin-main__panel" id="members-panel" data-klientoora-admin-main-panel="members" hidden>
 					<?php $klientoora_admin_menu->render_members_admin_main_view(); ?>
 				</section>
 
 				<section class="klientoora-admin-main__panel" id="club-activity-panel" data-klientoora-admin-main-panel="club-activity" hidden>
 					<?php $klientoora_admin_menu->render_club_activity_admin_main_view(); ?>
+				</section>
+
+				<section class="klientoora-admin-main__panel" id="settings-panel" data-klientoora-admin-main-panel="settings" hidden>
+					<h2><?php echo esc_html__( 'הגדרות', 'klientoora-card' ); ?></h2>
 				</section>
 			</main>
 		</div>

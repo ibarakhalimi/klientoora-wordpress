@@ -47,11 +47,13 @@ class Klientoora_Card_Public {
 	public function enqueue_styles() {
 		wp_enqueue_style( 'dashicons' );
 
+		$style_path = KLIENTOORA_CARD_PATH . 'public/css/klientoora-card-public.css';
+
 		wp_enqueue_style(
 			$this->plugin_name,
 			KLIENTOORA_CARD_URL . 'public/css/klientoora-card-public.css',
 			array(),
-			$this->version,
+			file_exists( $style_path ) ? filemtime( $style_path ) : $this->version,
 			'all'
 		);
 	}
@@ -62,11 +64,13 @@ class Klientoora_Card_Public {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		$script_path = KLIENTOORA_CARD_PATH . 'public/js/klientoora-card-public.js';
+
 		wp_enqueue_script(
 			$this->plugin_name,
 			KLIENTOORA_CARD_URL . 'public/js/klientoora-card-public.js',
 			array(),
-			$this->version,
+			file_exists( $script_path ) ? filemtime( $script_path ) : $this->version,
 			true
 		);
 
@@ -82,11 +86,14 @@ class Klientoora_Card_Public {
 				'submittingText'         => __( 'שולח...', 'klientoora-card' ),
 				'redeemPointsNonce'       => wp_create_nonce( 'klientoora_card_redeem_points' ),
 				'applyCouponNonce'        => wp_create_nonce( 'klientoora_card_apply_coupon' ),
+				'redeemChallengeNonce'    => wp_create_nonce( 'klientoora_card_redeem_challenge' ),
 				'redeemPointsErrorText'   => __( 'אירעה שגיאה במימוש הנקודות. נסו שוב.', 'klientoora-card' ),
 				'redeemPointsLoadingText' => __( 'מממש...', 'klientoora-card' ),
 				'clearPointsLoadingText'  => __( 'מבטל...', 'klientoora-card' ),
 				'applyCouponErrorText'    => __( 'אירעה שגיאה בהחלת הקופון. נסו שוב.', 'klientoora-card' ),
 				'applyCouponLoadingText'  => __( 'מחיל...', 'klientoora-card' ),
+				'redeemChallengeErrorText' => __( 'אירעה שגיאה במימוש ההטבה. נסו שוב.', 'klientoora-card' ),
+				'redeemChallengeLoadingText' => __( 'מממש...', 'klientoora-card' ),
 				'selectCouponText'        => __( 'בחירה', 'klientoora-card' ),
 				'selectedCouponText'      => __( 'נבחר', 'klientoora-card' ),
 				'redeemProductNonce'       => wp_create_nonce( 'klientoora_card_redeem_product' ),
@@ -393,6 +400,115 @@ class Klientoora_Card_Public {
 			array(
 				'message'  => $this->get_registration_notice_text( 'success', 'registered' ),
 				'pass_url' => ! empty( $webhook_result['pass_url'] ) ? $webhook_result['pass_url'] : '',
+			)
+		);
+	}
+
+	/**
+	 * Handles redeeming a completed challenge coupon.
+	 *
+	 * @return void
+	 */
+	public function handle_redeem_challenge() {
+		check_ajax_referer( 'klientoora_card_redeem_challenge', 'nonce' );
+
+		if ( ! is_user_logged_in() || ! function_exists( 'WC' ) || ! WC()->cart ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'לא ניתן לממש הטבה עבור משתמש זה.', 'klientoora-card' ),
+				),
+				403
+			);
+		}
+
+		$challenge_type = isset( $_POST['challenge_type'] ) ? sanitize_key( wp_unslash( $_POST['challenge_type'] ) ) : '';
+		$user_id        = get_current_user_id();
+		$source_coupon  = null;
+
+		if ( 'orders' === $challenge_type ) {
+			$orders_goal  = max( 1, absint( get_option( 'klientoora_card_order_challenge_goal', 5 ) ) );
+			$orders_count = $this->get_user_orders_count( $user_id );
+
+			if ( $orders_count < $orders_goal ) {
+				wp_send_json_error(
+					array(
+						'message' => __( 'האתגר עדיין לא הושלם.', 'klientoora-card' ),
+					),
+					403
+				);
+			}
+
+			$source_coupon = $this->get_order_challenge_coupon();
+		} elseif ( 'spend' === $challenge_type ) {
+			$spend_goal  = max( 0, (float) get_option( 'klientoora_card_spend_challenge_goal', 0 ) );
+			$spend_total = $this->get_user_paid_orders_total( $user_id );
+
+			if ( 0 >= $spend_goal || $spend_total < $spend_goal ) {
+				wp_send_json_error(
+					array(
+						'message' => __( 'האתגר עדיין לא הושלם.', 'klientoora-card' ),
+					),
+					403
+				);
+			}
+
+			$source_coupon = $this->get_spend_challenge_coupon();
+		} else {
+			wp_send_json_error(
+				array(
+					'message' => __( 'סוג האתגר אינו תקין.', 'klientoora-card' ),
+				),
+				400
+			);
+		}
+
+		$coupon = $this->get_or_create_personal_challenge_coupon( $challenge_type, $user_id, $source_coupon );
+
+		if ( ! $coupon || ! $coupon->get_id() ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'לא ניתן ליצור קופון אישי למימוש האתגר.', 'klientoora-card' ),
+				),
+				400
+			);
+		}
+
+		$coupon_code = wc_format_coupon_code( $coupon->get_code() );
+
+		if ( WC()->cart->has_discount( $coupon_code ) ) {
+			wp_send_json_success(
+				array(
+					'coupon_code' => $coupon_code,
+					'message'     => sprintf(
+						/* translators: %s is the coupon code. */
+						__( 'הקופון %s כבר מופעל בעגלה.', 'klientoora-card' ),
+						$coupon->get_code()
+					),
+				)
+			);
+		}
+
+		wc_clear_notices();
+
+		if ( ! WC()->cart->apply_coupon( $coupon_code ) ) {
+			wp_send_json_error(
+				array(
+					'message' => $this->get_latest_coupon_error_message(),
+				),
+				400
+			);
+		}
+
+		WC()->cart->calculate_totals();
+
+		wp_send_json_success(
+			array(
+				'coupon_code' => $coupon_code,
+				'message'     => sprintf(
+					/* translators: %s is the coupon code. */
+					__( 'הקופון %s מומש והוחל על העגלה.', 'klientoora-card' ),
+					$coupon->get_code()
+				),
 			)
 		);
 	}
@@ -814,11 +930,24 @@ class Klientoora_Card_Public {
 		$orders_progress   = min( $orders_count, $orders_goal );
 		$orders_percentage = ( $orders_progress / $orders_goal ) * 100;
 		$orders_remaining  = max( 0, $orders_goal - $orders_count );
+		$spend_total       = $this->get_user_paid_orders_total( $user_id );
+		$spend_goal        = max( 0, (float) get_option( 'klientoora_card_spend_challenge_goal', 0 ) );
+		$spend_progress    = 0 < $spend_goal ? min( $spend_total, $spend_goal ) : 0;
+		$spend_percentage  = 0 < $spend_goal ? ( $spend_progress / $spend_goal ) * 100 : 0;
+		$spend_remaining   = max( 0, $spend_goal - $spend_total );
+		$spend_goal_label  = function_exists( 'wc_price' ) ? wp_strip_all_tags( wc_price( $spend_goal ) ) : number_format_i18n( $spend_goal, 2 );
+		$spend_remaining_label = function_exists( 'wc_price' ) ? wp_strip_all_tags( wc_price( $spend_remaining ) ) : number_format_i18n( $spend_remaining, 2 );
 		$coupons           = $this->get_member_popup_coupons();
 		$challenge_coupon  = $this->get_order_challenge_coupon();
 		$challenge_reward  = $challenge_coupon
 			? $this->get_order_challenge_reward_label( $challenge_coupon )
 			: __( 'משלוח חינם', 'klientoora-card' );
+		$orders_challenge_can_redeem = $orders_count >= $orders_goal;
+		$spend_challenge_coupon = $this->get_spend_challenge_coupon();
+		$spend_challenge_reward = $spend_challenge_coupon
+			? $this->get_order_challenge_reward_label( $spend_challenge_coupon )
+			: __( 'משלוח חינם', 'klientoora-card' );
+		$spend_challenge_can_redeem = 0 < $spend_goal && $spend_total >= $spend_goal;
 		$redemption_products = class_exists( 'Klientoora_Card_Product_Redemption' )
 			? Klientoora_Card_Product_Redemption::get_redeemable_products()
 			: array();
@@ -928,18 +1057,29 @@ class Klientoora_Card_Public {
 
 			<div class="klientoora-card-member-orders" aria-labelledby="klientoora-card-member-orders-title">
 				<h3 id="klientoora-card-member-orders-title"><?php echo esc_html__( 'אתגרי מכירה', 'klientoora-card' ); ?></h3>
+				<div class="klientoora-card-member-orders__notice" data-klientoora-card-challenge-notice hidden></div>
 				<div class="klientoora-card-member-orders__summary">
 					<span><?php echo esc_html__( 'מספר הזמנות', 'klientoora-card' ); ?></span>
 					<strong>
 						<?php
-						echo esc_html(
-							sprintf(
-								/* translators: 1: remaining orders count, 2: order goal count. */
-								__( 'עוד %1$d ל-%2$d', 'klientoora-card' ),
-								$orders_remaining,
-								$orders_goal
-							)
-						);
+						if ( $orders_count >= $orders_goal ) {
+							echo esc_html(
+								sprintf(
+									/* translators: %s is the challenge reward label. */
+									__( 'זכאי לקבלת %s', 'klientoora-card' ),
+									$challenge_reward
+								)
+							);
+						} else {
+							echo esc_html(
+								sprintf(
+									/* translators: 1: remaining orders count, 2: challenge reward label. */
+									__( 'עוד %1$d לקבלת %2$s', 'klientoora-card' ),
+									$orders_remaining,
+									$challenge_reward
+								)
+							);
+						}
 						?>
 					</strong>
 				</div>
@@ -960,6 +1100,68 @@ class Klientoora_Card_Public {
 						?>
 					</li>
 				</ul>
+				<button
+					type="button"
+					class="klientoora-card-primary-action klientoora-card-member-orders__redeem"
+					data-klientoora-card-redeem-challenge
+					data-challenge-type="orders"
+					<?php disabled( ! $orders_challenge_can_redeem ); ?>
+				>
+					<?php echo esc_html__( 'מימוש', 'klientoora-card' ); ?>
+				</button>
+				<?php if ( 0 < $spend_goal ) : ?>
+					<div class="klientoora-card-member-orders__summary">
+						<span><?php echo esc_html__( 'סכום הזמנות', 'klientoora-card' ); ?></span>
+						<strong>
+							<?php
+							if ( $spend_total >= $spend_goal ) {
+								echo esc_html(
+									sprintf(
+										/* translators: %s is the challenge reward label. */
+										__( 'זכאי לקבלת %s', 'klientoora-card' ),
+										$spend_challenge_reward
+									)
+								);
+							} else {
+								echo esc_html(
+									sprintf(
+										/* translators: 1: remaining paid spend, 2: challenge reward label. */
+										__( 'עוד %1$s לקבלת %2$s', 'klientoora-card' ),
+										$spend_remaining_label,
+										$spend_challenge_reward
+									)
+								);
+							}
+							?>
+						</strong>
+					</div>
+					<div class="klientoora-card-member-orders__meter" role="meter" aria-valuemin="0" aria-valuemax="<?php echo esc_attr( $spend_goal ); ?>" aria-valuenow="<?php echo esc_attr( $spend_progress ); ?>">
+						<span style="width: <?php echo esc_attr( $spend_percentage ); ?>%;"></span>
+					</div>
+					<ul class="klientoora-card-member-orders__steps" aria-label="<?php echo esc_attr__( 'שלבי הטבות לפי סכום הזמנות', 'klientoora-card' ); ?>">
+						<li class="<?php echo esc_attr( $spend_total >= $spend_goal ? 'is-complete' : '' ); ?>">
+							<?php
+							echo esc_html(
+								sprintf(
+									/* translators: 1: spend goal, 2: challenge reward label. */
+									__( 'ב-%1$s: %2$s', 'klientoora-card' ),
+									$spend_goal_label,
+									$spend_challenge_reward
+								)
+							);
+							?>
+						</li>
+					</ul>
+					<button
+						type="button"
+						class="klientoora-card-primary-action klientoora-card-member-orders__redeem"
+						data-klientoora-card-redeem-challenge
+						data-challenge-type="spend"
+						<?php disabled( ! $spend_challenge_can_redeem ); ?>
+					>
+						<?php echo esc_html__( 'מימוש', 'klientoora-card' ); ?>
+					</button>
+				<?php endif; ?>
 			</div>
 		</div>
 		<?php
@@ -1039,6 +1241,147 @@ class Klientoora_Card_Public {
 	}
 
 	/**
+	 * Returns an existing personal challenge coupon or creates one from the configured reward.
+	 *
+	 * @param string         $challenge_type Challenge type.
+	 * @param int            $user_id        User ID.
+	 * @param WC_Coupon|null $source_coupon  Optional configured WooCommerce coupon.
+	 *
+	 * @return WC_Coupon|null
+	 */
+	private function get_or_create_personal_challenge_coupon( $challenge_type, $user_id, $source_coupon = null ) {
+		if ( ! class_exists( 'WC_Coupon' ) || ! in_array( $challenge_type, array( 'orders', 'spend' ), true ) ) {
+			return null;
+		}
+
+		$coupon = $this->get_existing_personal_challenge_coupon( $challenge_type, $user_id );
+
+		if ( ! $coupon ) {
+			$coupon = new WC_Coupon();
+			$coupon->set_code( $this->generate_personal_challenge_coupon_code( $challenge_type, $user_id ) );
+		}
+
+		$this->apply_challenge_coupon_reward( $coupon, $source_coupon, $challenge_type );
+		$coupon->set_status( 'publish' );
+		$coupon->set_usage_limit( 1 );
+		$coupon->set_usage_limit_per_user( 1 );
+		$coupon->update_meta_data( '_klientoora_challenge_coupon', 'yes' );
+		$coupon->update_meta_data( '_klientoora_challenge_type', $challenge_type );
+		$coupon->update_meta_data( '_klientoora_challenge_user_id', $user_id );
+		$coupon->save();
+
+		return $coupon;
+	}
+
+	/**
+	 * Finds an existing personal challenge coupon for a user.
+	 *
+	 * @param string $challenge_type Challenge type.
+	 * @param int    $user_id        User ID.
+	 *
+	 * @return WC_Coupon|null
+	 */
+	private function get_existing_personal_challenge_coupon( $challenge_type, $user_id ) {
+		$coupon_ids = get_posts(
+			array(
+				'fields'         => 'ids',
+				'meta_query'     => array(
+					'relation' => 'AND',
+					array(
+						'key'   => '_klientoora_challenge_coupon',
+						'value' => 'yes',
+					),
+					array(
+						'key'   => '_klientoora_challenge_type',
+						'value' => $challenge_type,
+					),
+					array(
+						'key'   => '_klientoora_challenge_user_id',
+						'value' => (string) $user_id,
+					),
+				),
+				'post_status'    => 'any',
+				'post_type'      => 'shop_coupon',
+				'posts_per_page' => 1,
+			)
+		);
+
+		if ( empty( $coupon_ids ) ) {
+			return null;
+		}
+
+		$coupon = new WC_Coupon( $coupon_ids[0] );
+
+		return $coupon->get_id() ? $coupon : null;
+	}
+
+	/**
+	 * Applies the configured challenge reward to a personal coupon.
+	 *
+	 * @param WC_Coupon      $coupon         Personal coupon.
+	 * @param WC_Coupon|null $source_coupon  Optional configured source coupon.
+	 * @param string         $challenge_type Challenge type.
+	 *
+	 * @return void
+	 */
+	private function apply_challenge_coupon_reward( $coupon, $source_coupon, $challenge_type ) {
+		$description = 'orders' === $challenge_type
+			? __( 'קופון אישי מאתגר מספר הזמנות', 'klientoora-card' )
+			: __( 'קופון אישי מאתגר סכום הזמנות', 'klientoora-card' );
+
+		$coupon->set_description( $description );
+
+		if ( $source_coupon && $source_coupon->get_id() ) {
+			$coupon->set_discount_type( $source_coupon->get_discount_type() );
+			$coupon->set_amount( $source_coupon->get_amount() );
+			$coupon->set_free_shipping( $source_coupon->get_free_shipping() );
+			$coupon->set_date_expires( $source_coupon->get_date_expires() );
+			$coupon->set_minimum_amount( $source_coupon->get_minimum_amount() );
+			$coupon->set_maximum_amount( $source_coupon->get_maximum_amount() );
+			$coupon->set_individual_use( $source_coupon->get_individual_use() );
+			$coupon->set_product_ids( $source_coupon->get_product_ids() );
+			$coupon->set_excluded_product_ids( $source_coupon->get_excluded_product_ids() );
+			$coupon->set_product_categories( $source_coupon->get_product_categories() );
+			$coupon->set_excluded_product_categories( $source_coupon->get_excluded_product_categories() );
+			$coupon->set_exclude_sale_items( $source_coupon->get_exclude_sale_items() );
+
+			return;
+		}
+
+		$coupon->set_discount_type( 'fixed_cart' );
+		$coupon->set_amount( 0 );
+		$coupon->set_free_shipping( true );
+		$coupon->set_date_expires( null );
+		$coupon->set_minimum_amount( '' );
+		$coupon->set_maximum_amount( '' );
+		$coupon->set_individual_use( false );
+		$coupon->set_product_ids( array() );
+		$coupon->set_excluded_product_ids( array() );
+		$coupon->set_product_categories( array() );
+		$coupon->set_excluded_product_categories( array() );
+		$coupon->set_exclude_sale_items( false );
+	}
+
+	/**
+	 * Generates a unique personal challenge coupon code.
+	 *
+	 * @param string $challenge_type Challenge type.
+	 * @param int    $user_id        User ID.
+	 *
+	 * @return string
+	 */
+	private function generate_personal_challenge_coupon_code( $challenge_type, $user_id ) {
+		$prefix = 'orders' === $challenge_type ? 'KLC-ORD' : 'KLC-SPD';
+		$code   = sprintf( '%1$s-%2$d', $prefix, $user_id );
+
+		if ( function_exists( 'wc_get_coupon_id_by_code' ) && wc_get_coupon_id_by_code( $code ) ) {
+			$code = sprintf( '%1$s-%2$d-%3$s', $prefix, $user_id, wp_generate_password( 6, false, false ) );
+		}
+
+		return $code;
+	}
+
+	/**
 	 * Returns the configured order challenge coupon.
 	 *
 	 * @return WC_Coupon|null
@@ -1049,6 +1392,31 @@ class Klientoora_Card_Public {
 		}
 
 		$coupon_id = absint( get_option( 'klientoora_card_order_challenge_coupon_id', 0 ) );
+
+		if ( 0 >= $coupon_id ) {
+			return null;
+		}
+
+		$coupon = new WC_Coupon( $coupon_id );
+
+		if ( ! $coupon->get_id() || ! $this->is_member_popup_coupon_active( $coupon ) ) {
+			return null;
+		}
+
+		return $coupon;
+	}
+
+	/**
+	 * Returns the configured spend challenge coupon.
+	 *
+	 * @return WC_Coupon|null
+	 */
+	private function get_spend_challenge_coupon() {
+		if ( ! class_exists( 'WC_Coupon' ) ) {
+			return null;
+		}
+
+		$coupon_id = absint( get_option( 'klientoora_card_spend_challenge_coupon_id', 0 ) );
 
 		if ( 0 >= $coupon_id ) {
 			return null;
@@ -1080,6 +1448,31 @@ class Klientoora_Card_Public {
 	}
 
 	/**
+	 * Returns the latest WooCommerce coupon error message.
+	 *
+	 * @return string
+	 */
+	private function get_latest_coupon_error_message() {
+		if ( function_exists( 'wc_get_notices' ) ) {
+			$notices = wc_get_notices( 'error' );
+
+			if ( ! empty( $notices ) ) {
+				$last_notice = end( $notices );
+
+				if ( is_array( $last_notice ) && ! empty( $last_notice['notice'] ) ) {
+					return wp_strip_all_tags( $last_notice['notice'] );
+				}
+
+				if ( is_string( $last_notice ) ) {
+					return wp_strip_all_tags( $last_notice );
+				}
+			}
+		}
+
+		return __( 'לא ניתן לממש את הקופון כעת.', 'klientoora-card' );
+	}
+
+	/**
 	 * Returns the current user's WooCommerce order count.
 	 *
 	 * @param int $user_id User ID.
@@ -1104,6 +1497,41 @@ class Klientoora_Card_Public {
 		);
 
 		return is_array( $orders ) ? count( $orders ) : 0;
+	}
+
+	/**
+	 * Returns the total amount paid by the current user in WooCommerce orders.
+	 *
+	 * @param int $user_id User ID.
+	 *
+	 * @return float
+	 */
+	private function get_user_paid_orders_total( $user_id ) {
+		if ( ! function_exists( 'wc_get_orders' ) ) {
+			return 0;
+		}
+
+		$statuses = function_exists( 'wc_get_is_paid_statuses' ) ? wc_get_is_paid_statuses() : array( 'processing', 'completed' );
+		$orders   = wc_get_orders(
+			array(
+				'customer_id' => $user_id,
+				'limit'       => -1,
+				'status'      => $statuses,
+			)
+		);
+		$total    = 0;
+
+		if ( ! is_array( $orders ) ) {
+			return 0;
+		}
+
+		foreach ( $orders as $order ) {
+			if ( method_exists( $order, 'get_total' ) ) {
+				$total += (float) $order->get_total();
+			}
+		}
+
+		return $total;
 	}
 
 	/**

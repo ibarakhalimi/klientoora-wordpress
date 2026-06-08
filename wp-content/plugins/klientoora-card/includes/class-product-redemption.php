@@ -19,6 +19,7 @@ class Klientoora_Card_Product_Redemption {
 	const CART_ITEM_KEY = 'klientoora_card_points_redemption';
 	const CART_POINTS_KEY = 'klientoora_card_points_price';
 	const CART_USER_KEY = 'klientoora_card_points_user_id';
+	const CART_DEDUCTED_KEY = 'klientoora_card_points_deducted';
 	const CART_RESTORED_KEY = 'klientoora_card_points_restored';
 	const SESSION_LEDGER_KEY = 'klientoora_card_points_cart_ledger';
 
@@ -232,8 +233,9 @@ class Klientoora_Card_Product_Redemption {
 			);
 		}
 
-		$points_price = self::get_product_points_price( $product );
-		$balance      = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+		$points_price         = self::get_product_points_price( $product );
+		$balance              = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+		$cart_redemption_cost = $this->get_cart_redemption_points_total( $user_id );
 
 		if ( $this->cart_has_redeemed_product( $product_id ) ) {
 			wp_send_json_success(
@@ -245,7 +247,7 @@ class Klientoora_Card_Product_Redemption {
 			);
 		}
 
-		if ( $balance < $points_price ) {
+		if ( $balance < $cart_redemption_cost + $points_price ) {
 			wp_send_json_error(
 				array( 'message' => __( 'אין לך מספיק נקודות למימוש המוצר.', 'klientoora-card' ) ),
 				400
@@ -261,6 +263,7 @@ class Klientoora_Card_Product_Redemption {
 				self::CART_ITEM_KEY   => true,
 				self::CART_POINTS_KEY => $points_price,
 				self::CART_USER_KEY   => $user_id,
+				self::CART_DEDUCTED_KEY => false,
 				'unique_key'         => 'klientoora_points_' . $product_id . '_' . wp_generate_uuid4(),
 			)
 		);
@@ -272,16 +275,15 @@ class Klientoora_Card_Product_Redemption {
 			);
 		}
 
-		Klientoora_Card_Points::remove_points( $user_id, $points_price, 'product_redemption_cart_add' );
-		$this->save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points_price, false );
+		$this->save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points_price, false, false );
 
 		WC()->cart->calculate_totals();
 
 		wp_send_json_success(
 			array(
-				'message'        => __( 'המוצר נוסף לעגלה והנקודות נשמרו למימוש.', 'klientoora-card' ),
+				'message'        => __( 'המוצר נוסף לעגלה למימוש בנקודות. הנקודות ינוכו בשליחת ההזמנה.', 'klientoora-card' ),
 				'cart_url'       => wc_get_cart_url(),
-				'points_balance' => max( 0, $balance - $points_price ),
+				'points_balance' => $balance,
 			)
 		);
 	}
@@ -430,7 +432,8 @@ class Klientoora_Card_Product_Redemption {
 			$user_id,
 			isset( $cart_item['product_id'] ) ? absint( $cart_item['product_id'] ) : 0,
 			$points,
-			false
+			false,
+			true
 		);
 
 		if ( isset( $cart->removed_cart_contents[ $cart_item_key ][ self::CART_RESTORED_KEY ] ) ) {
@@ -458,6 +461,14 @@ class Klientoora_Card_Product_Redemption {
 			return;
 		}
 
+		$was_deducted = ! empty( $cart_item[ self::CART_DEDUCTED_KEY ] )
+			|| ( isset( $ledger_item['deducted'] ) && $ledger_item['deducted'] )
+			|| ( ! isset( $ledger_item['deducted'] ) && ! empty( $ledger_item ) );
+
+		if ( ! $was_deducted ) {
+			return;
+		}
+
 		$was_restored = ! empty( $cart_item[ self::CART_RESTORED_KEY ] )
 			|| ( isset( $ledger_item['restored'] ) && $ledger_item['restored'] );
 
@@ -480,7 +491,7 @@ class Klientoora_Card_Product_Redemption {
 		}
 
 		Klientoora_Card_Points::add_points( $user_id, $points, 'product_redemption_cart_removed' );
-		$this->save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points, true );
+		$this->save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points, true, true );
 
 		if ( isset( $cart->removed_cart_contents[ $cart_item_key ] ) ) {
 			$cart->removed_cart_contents[ $cart_item_key ][ self::CART_RESTORED_KEY ] = true;
@@ -548,15 +559,41 @@ class Klientoora_Card_Product_Redemption {
 			return;
 		}
 
-		$this->is_creating_redemption_order = true;
-
 		$user_id = absint( $order->get_user_id() );
+
+		if ( 0 >= $user_id ) {
+			return;
+		}
+
+		$balance = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+
+		if ( $balance < $total_points ) {
+			throw new Exception( esc_html__( 'אין מספיק נקודות כדי להשלים את מימוש המוצרים.', 'klientoora-card' ) );
+		}
+
+		$this->is_creating_redemption_order = true;
 
 		$order->update_meta_data( '_klientoora_card_points_product_redemption', 'yes' );
 		$order->update_meta_data( '_klientoora_card_product_redemption_points_total', $total_points );
+		$order->update_meta_data( '_klientoora_card_product_redemption_points_deducted', 'yes' );
 
-		if ( 0 < $user_id ) {
-			update_user_meta( $user_id, 'loyalty_points_redeemed_total', absint( get_user_meta( $user_id, 'loyalty_points_redeemed_total', true ) ) + $total_points );
+		Klientoora_Card_Points::remove_points( $user_id, $total_points, 'product_redemption_order_created' );
+		update_user_meta( $user_id, 'loyalty_points_redeemed_total', absint( get_user_meta( $user_id, 'loyalty_points_redeemed_total', true ) ) + $total_points );
+
+		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+			if ( empty( $cart_item[ self::CART_ITEM_KEY ] ) ) {
+				continue;
+			}
+
+			WC()->cart->cart_contents[ $cart_item_key ][ self::CART_DEDUCTED_KEY ] = true;
+			$this->save_cart_ledger_item(
+				$cart_item_key,
+				$user_id,
+				isset( $cart_item['product_id'] ) ? absint( $cart_item['product_id'] ) : 0,
+				isset( $cart_item[ self::CART_POINTS_KEY ] ) ? absint( $cart_item[ self::CART_POINTS_KEY ] ) : 0,
+				false,
+				true
+			);
 		}
 	}
 
@@ -593,10 +630,11 @@ class Klientoora_Card_Product_Redemption {
 	 * @param int    $product_id    Product ID.
 	 * @param int    $points        Point price.
 	 * @param bool   $restored      Whether points were restored for this removed item.
+	 * @param bool   $deducted      Whether points were deducted for this cart item.
 	 *
 	 * @return void
 	 */
-	private function save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points, $restored ) {
+	private function save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points, $restored, $deducted ) {
 		if ( ! function_exists( 'WC' ) || ! WC()->session ) {
 			return;
 		}
@@ -607,6 +645,7 @@ class Klientoora_Card_Product_Redemption {
 			'product_id' => absint( $product_id ),
 			'points'     => absint( $points ),
 			'restored'   => (bool) $restored,
+			'deducted'   => (bool) $deducted,
 		);
 
 		WC()->session->set( self::SESSION_LEDGER_KEY, $ledger );
@@ -665,5 +704,34 @@ class Klientoora_Card_Product_Redemption {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns the total points currently reserved by point redemption cart items.
+	 *
+	 * @param int $user_id User ID.
+	 *
+	 * @return int
+	 */
+	private function get_cart_redemption_points_total( $user_id ) {
+		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+			return 0;
+		}
+
+		$total = 0;
+
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( empty( $cart_item[ self::CART_ITEM_KEY ] ) ) {
+				continue;
+			}
+
+			if ( isset( $cart_item[ self::CART_USER_KEY ] ) && absint( $cart_item[ self::CART_USER_KEY ] ) !== absint( $user_id ) ) {
+				continue;
+			}
+
+			$total += isset( $cart_item[ self::CART_POINTS_KEY ] ) ? absint( $cart_item[ self::CART_POINTS_KEY ] ) : 0;
+		}
+
+		return $total;
 	}
 }

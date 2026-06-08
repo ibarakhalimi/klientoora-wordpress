@@ -54,7 +54,7 @@
 .klientoora-card-offcanvas[hidden],
 .klientoora-card-form[hidden],
 .klientoora-card-registration-success[hidden] {
-	display: none;
+	display: none !important;
 }
 
 .klientoora-card-modal-open {
@@ -89,6 +89,10 @@
 	top: 50%;
 	transform: translate(-50%, -50%) scale(0.96);
 	width: 100%;
+}
+
+#klientoora-card-member-panel {
+	max-width: min(980px, calc(100vw - 32px));
 }
 
 .klientoora-card-offcanvas {
@@ -328,6 +332,27 @@
 	margin-bottom: 12px;
 }
 
+.klientoora-card-member-orders__summary:not(:first-of-type) {
+	margin-top: 16px;
+}
+
+.klientoora-card-member-orders__notice {
+	background: #ecfdf5;
+	border: 1px solid #bbf7d0;
+	border-radius: 6px;
+	color: #166534;
+	font-size: 14px;
+	font-weight: 700;
+	margin-bottom: 12px;
+	padding: 10px 12px;
+}
+
+.klientoora-card-member-orders__notice.is-error {
+	background: #fef2f2;
+	border-color: #fecaca;
+	color: #991b1b;
+}
+
 .klientoora-card-member-orders__summary span {
 	color: #646970;
 }
@@ -374,6 +399,10 @@
 	color: #646970;
 	font-size: 14px;
 	margin: 12px 0 0;
+}
+
+.klientoora-card-member-orders__redeem {
+	margin-top: 12px;
 }
 
 .klientoora-card-close {
@@ -427,15 +456,18 @@
 	color: #fff;
 }
 
+.klientoora-card-primary-action:disabled,
+.klientoora-card-primary-action[disabled] {
+	background: #e5e7eb;
+	border-color: #d1d5db;
+	color: #6b7280;
+	cursor: not-allowed;
+}
+
 .klientoora-card-primary-action:hover,
 .klientoora-card-primary-action:focus {
 	background: #2563eb;
 	color: #fff;
-}
-
-.klientoora-card-primary-action:disabled {
-	cursor: wait;
-	opacity: 0.72;
 }
 
 .klientoora-card-secondary-action {
@@ -625,6 +657,35 @@
 	background: #fef2f2;
 	border-color: #fecaca;
 	color: #991b1b;
+}
+
+@media (min-width: 900px) {
+	#klientoora-card-member-panel:not([hidden]) {
+		display: grid;
+		gap: 14px;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		max-height: calc(100vh - 28px);
+		overflow-y: auto;
+		padding: 22px;
+	}
+
+	#klientoora-card-member-panel > .klientoora-card-close,
+	#klientoora-card-member-panel > h2,
+	#klientoora-card-member-panel > p {
+		grid-column: 1 / -1;
+	}
+
+	#klientoora-card-member-panel > h2,
+	#klientoora-card-member-panel > p {
+		margin-bottom: 0;
+	}
+
+	#klientoora-card-member-panel .klientoora-card-member-benefits,
+	#klientoora-card-member-panel .klientoora-card-member-coupons,
+	#klientoora-card-member-panel .klientoora-card-member-products,
+	#klientoora-card-member-panel .klientoora-card-member-orders {
+		margin-top: 0;
+	}
 }
 
 @media (max-width: 600px) {

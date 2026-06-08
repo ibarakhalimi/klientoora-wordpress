@@ -83,6 +83,8 @@ class Klientoora_Card {
 		$this->loader->add_action( 'admin_post_klientoora_card_save_coupon', $admin_menu, 'handle_save_coupon' );
 		$this->loader->add_action( 'admin_post_klientoora_card_delete_coupon', $admin_menu, 'handle_delete_coupon' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_member_discount', $admin_menu, 'handle_save_member_discount' );
+		$this->loader->add_action( 'admin_post_klientoora_card_save_challenge', $admin_menu, 'handle_save_challenge' );
+		$this->loader->add_action( 'admin_post_klientoora_card_create_product', $admin_menu, 'handle_create_product' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_product_redemptions', $admin_menu, 'handle_save_product_redemptions' );
 		$this->loader->add_action( 'admin_post_klientoora_card_save_order_statuses', $admin_menu, 'handle_save_order_statuses' );
 		$this->loader->add_action( 'admin_post_klientoora_card_advance_order_status', $admin_menu, 'handle_advance_order_status' );
@@ -124,6 +126,7 @@ class Klientoora_Card {
 		$this->loader->add_action( 'admin_post_klientoora_card_register_member', $plugin_public, 'handle_member_registration' );
 		$this->loader->add_action( 'wp_ajax_nopriv_klientoora_card_register_member', $plugin_public, 'handle_member_registration_ajax' );
 		$this->loader->add_action( 'wp_ajax_klientoora_card_register_member', $plugin_public, 'handle_member_registration_ajax' );
+		$this->loader->add_action( 'wp_ajax_klientoora_card_redeem_challenge', $plugin_public, 'handle_redeem_challenge' );
 		$this->loader->add_filter( 'woocommerce_coupon_is_valid', $coupon_validation, 'validate_members_only_coupon', 10, 2 );
 		$this->loader->add_action( 'woocommerce_before_checkout_form', $checkout_redemption, 'render_checkout_box' );
 		$this->loader->add_action( 'woocommerce_checkout_before_order_review', $checkout_redemption, 'render_checkout_box' );

@@ -489,6 +489,102 @@
 			} );
 	}
 
+	function getChallengeBox( element ) {
+		return element ? element.closest( '.klientoora-card-member-orders' ) : null;
+	}
+
+	function setChallengeNotice( box, message, isError ) {
+		var notice = box ? box.querySelector( '[data-klientoora-card-challenge-notice]' ) : null;
+
+		if ( ! notice ) {
+			return;
+		}
+
+		notice.textContent = message || '';
+		notice.classList.toggle( 'is-error', !! isError );
+		notice.hidden = ! message;
+	}
+
+	function setChallengeLoading( button, isLoading ) {
+		if ( ! button ) {
+			return;
+		}
+
+		if ( isLoading ) {
+			button.dataset.originalText = button.textContent;
+			button.textContent = getConfigValue( 'redeemChallengeLoadingText', 'Redeeming...' );
+			button.disabled = true;
+			return;
+		}
+
+		if ( button.dataset.originalText ) {
+			button.textContent = button.dataset.originalText;
+		}
+
+		button.disabled = false;
+	}
+
+	function sendChallengeRedemptionRequest( button ) {
+		var box = getChallengeBox( button );
+		var challengeType = button ? button.dataset.challengeType || '' : '';
+		var formData = new window.FormData();
+
+		if ( ! box || ! challengeType ) {
+			return;
+		}
+
+		formData.append( 'action', 'klientoora_card_redeem_challenge' );
+		formData.append( 'nonce', getConfigValue( 'redeemChallengeNonce', '' ) );
+		formData.append( 'challenge_type', challengeType );
+
+		setChallengeNotice( box, '', false );
+		setChallengeLoading( button, true );
+
+		window.fetch( getConfigValue( 'ajaxUrl', '' ), {
+			method: 'POST',
+			body: formData,
+			credentials: 'same-origin',
+			headers: {
+				Accept: 'application/json'
+			}
+		} )
+			.then( function ( response ) {
+				return response.text().then( function ( text ) {
+					var json = null;
+
+					try {
+						json = JSON.parse( text );
+					} catch ( error ) {
+						throw new Error( getConfigValue( 'redeemChallengeErrorText', 'Error' ) );
+					}
+
+					if ( ! response.ok || ! json || ! json.success ) {
+						throw new Error(
+							json && json.data && json.data.message
+								? json.data.message
+								: getConfigValue( 'redeemChallengeErrorText', 'Error' )
+						);
+					}
+
+					return json.data || {};
+				} );
+			} )
+			.then( function ( data ) {
+				setChallengeNotice( box, data.message || '', false );
+				refreshWooCheckout();
+			} )
+			.catch( function ( error ) {
+				setChallengeNotice(
+					box,
+					error.message || getConfigValue( 'redeemChallengeErrorText', 'Error' ),
+					true
+				);
+			} )
+			.finally( function () {
+				setChallengeLoading( button, false );
+			} );
+	}
+
 	function getProductRedemptionBox( element ) {
 		return element ? element.closest( '[data-klientoora-card-product-redemptions]' ) : null;
 	}
@@ -721,6 +817,7 @@
 		var redeemPointsTrigger = event.target.closest( '[data-klientoora-card-redeem-points]' );
 		var clearRedeemedPointsTrigger = event.target.closest( '[data-klientoora-card-clear-redeemed-points]' );
 		var applyCouponTrigger = event.target.closest( '[data-klientoora-card-apply-coupon]' );
+		var redeemChallengeTrigger = event.target.closest( '[data-klientoora-card-redeem-challenge]' );
 		var redeemProductTrigger = event.target.closest( '[data-klientoora-card-redeem-product]' );
 
 		if ( modalTrigger ) {
@@ -781,6 +878,12 @@
 		if ( applyCouponTrigger ) {
 			event.preventDefault();
 			sendCheckoutCouponRequest( applyCouponTrigger );
+			return;
+		}
+
+		if ( redeemChallengeTrigger ) {
+			event.preventDefault();
+			sendChallengeRedemptionRequest( redeemChallengeTrigger );
 			return;
 		}
 

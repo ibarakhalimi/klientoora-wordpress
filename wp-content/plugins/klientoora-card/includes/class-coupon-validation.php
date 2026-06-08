@@ -29,6 +29,15 @@ class Klientoora_Card_Coupon_Validation {
 			return $is_valid;
 		}
 
+		if ( 'yes' === $coupon->get_meta( '_klientoora_challenge_coupon' ) ) {
+			$coupon_user_id  = absint( $coupon->get_meta( '_klientoora_challenge_user_id' ) );
+			$current_user_id = get_current_user_id();
+
+			if ( ! $current_user_id || $coupon_user_id !== $current_user_id ) {
+				throw new Exception( esc_html__( 'קופון זה אישי ואינו זמין למשתמש זה.', 'klientoora-card' ) );
+			}
+		}
+
 		if ( 'yes' !== $coupon->get_meta( '_loyalty_members_only' ) ) {
 			return $is_valid;
 		}

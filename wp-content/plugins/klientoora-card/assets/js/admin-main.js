@@ -17,6 +17,14 @@
 		return hash ? hash.replace( '#', '' ) : 'dashboard';
 	}
 
+	function getUrlParams() {
+		return new URLSearchParams( window.location.search );
+	}
+
+	function hasMainTab( tab ) {
+		return !! document.querySelector( '[data-klientoora-admin-main-panel="' + tab + '"]' );
+	}
+
 	function activateTab( tab ) {
 		var selectedPanel = document.querySelector( '[data-klientoora-admin-main-panel="' + tab + '"]' );
 
@@ -31,6 +39,33 @@
 		panels.forEach( function ( panel ) {
 			panel.hidden = panel.dataset.klientooraAdminMainPanel !== tab;
 		} );
+	}
+
+	function getInitialMainTab() {
+		var params = getUrlParams();
+		var requestedTab = params.get( 'klientoora_admin_main_tab' );
+
+		if ( requestedTab && hasMainTab( requestedTab ) ) {
+			return requestedTab;
+		}
+
+		if (
+			params.has( 'klientoora_card_product_redemption_notice' ) ||
+			params.has( 'klientoora_card_challenge_notice' ) ||
+			params.has( 'klientoora_card_coupon_notice' )
+		) {
+			return 'club-activity';
+		}
+
+		if ( params.has( 'klientoora_card_products_notice' ) ) {
+			return 'products';
+		}
+
+		if ( params.has( 'klientoora_card_orders_notice' ) ) {
+			return 'orders';
+		}
+
+		return getTabFromHash( window.location.hash );
 	}
 
 	function getSavedOrderStatuses() {
@@ -157,14 +192,43 @@
 		} );
 	}
 
+	function activateInitialClubActivityTab() {
+		var params = getUrlParams();
+		var requestedTab = params.get( 'klientoora_club_activity_tab' );
+
+		if ( requestedTab ) {
+			activateClubActivityTab( requestedTab );
+			return;
+		}
+
+		if ( params.has( 'klientoora_card_challenge_notice' ) ) {
+			activateClubActivityTab( 'challenges' );
+			return;
+		}
+
+		if ( params.has( 'klientoora_card_product_redemption_notice' ) ) {
+			activateClubActivityTab( 'point-redemptions' );
+		}
+	}
+
 	document.addEventListener( 'click', function ( event ) {
 		var link = event.target.closest( '.klientoora-admin-main__nav a' );
+		var tab = link ? getTabFromHash( link.hash ) : '';
 
 		if ( ! link ) {
 			return;
 		}
 
-		activateTab( getTabFromHash( link.hash ) );
+		if ( ! hasMainTab( tab ) ) {
+			return;
+		}
+
+		event.preventDefault();
+		activateTab( tab );
+
+		if ( window.location.hash !== link.hash ) {
+			window.history.pushState( null, '', link.hash );
+		}
 	} );
 
 	document.addEventListener( 'click', function ( event ) {
@@ -173,6 +237,8 @@
 		var toastCloseButton = event.target.closest( '[data-klientoora-admin-toast-close]' );
 		var clubActivityTab = event.target.closest( '[data-klientoora-club-activity-tab]' );
 		var couponCard = event.target.closest( '[data-klientoora-coupon-dialog-trigger]' );
+		var productDialogTrigger = event.target.closest( '[data-klientoora-product-dialog-trigger]' );
+		var productDialogCloseButton = event.target.closest( '[data-klientoora-product-dialog-close]' );
 		var orderCard = event.target.closest( '[data-klientoora-order-dialog-trigger]' );
 
 		if ( clubActivityTab ) {
@@ -205,8 +271,23 @@
 			return;
 		}
 
+		if ( productDialogCloseButton ) {
+			closeOrderDialog( productDialogCloseButton.closest( 'dialog' ) );
+			return;
+		}
+
+		if ( event.target.matches( '.klientoora-admin-main-product-dialog' ) ) {
+			closeOrderDialog( event.target );
+			return;
+		}
+
 		if ( couponCard ) {
 			openOrderDialog( couponCard.dataset.klientooraCouponDialogTrigger );
+			return;
+		}
+
+		if ( productDialogTrigger ) {
+			openOrderDialog( productDialogTrigger.dataset.klientooraProductDialogTrigger );
 			return;
 		}
 
@@ -217,11 +298,18 @@
 
 	document.addEventListener( 'keydown', function ( event ) {
 		var couponCard = event.target.closest( '[data-klientoora-coupon-dialog-trigger]' );
+		var productDialogTrigger = event.target.closest( '[data-klientoora-product-dialog-trigger]' );
 		var orderCard = event.target.closest( '[data-klientoora-order-dialog-trigger]' );
 
 		if ( couponCard && ( event.key === 'Enter' || event.key === ' ' ) ) {
 			event.preventDefault();
 			openOrderDialog( couponCard.dataset.klientooraCouponDialogTrigger );
+			return;
+		}
+
+		if ( productDialogTrigger && ( event.key === 'Enter' || event.key === ' ' ) ) {
+			event.preventDefault();
+			openOrderDialog( productDialogTrigger.dataset.klientooraProductDialogTrigger );
 			return;
 		}
 
@@ -239,5 +327,6 @@
 
 	setupOrderStatusFilters();
 	setupToasts();
-	activateTab( getTabFromHash( window.location.hash ) );
+	activateTab( getInitialMainTab() );
+	activateInitialClubActivityTab();
 }() );
