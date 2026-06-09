@@ -505,6 +505,66 @@
 		notice.hidden = ! message;
 	}
 
+	function addPersonalBenefit( benefit ) {
+		var container = document.querySelector( '[data-klientoora-card-personal-benefits]' );
+		var list = container ? container.querySelector( '.klientoora-card-member-coupons__list' ) : null;
+		var empty = container ? container.querySelector( '[data-klientoora-card-personal-benefits-empty]' ) : null;
+		var title = container ? container.querySelector( 'h3' ) : null;
+		var item = document.createElement( 'div' );
+		var summary = document.createElement( 'strong' );
+		var details = document.createElement( 'span' );
+
+		if ( ! container || ! benefit || ! benefit.id ) {
+			return;
+		}
+
+		if ( container.querySelector( '[data-klientoora-card-personal-benefit-id="' + benefit.id + '"]' ) ) {
+			return;
+		}
+
+		if ( ! list ) {
+			list = document.createElement( 'div' );
+			list.className = 'klientoora-card-member-coupons__list';
+			container.insertBefore( list, title ? title.nextSibling : container.firstChild );
+		}
+
+		if ( empty ) {
+			empty.remove();
+		}
+
+		item.className = 'klientoora-card-member-coupon';
+		item.dataset.klientooraCardPersonalBenefitId = benefit.id;
+		summary.textContent = benefit.summary || '';
+		details.textContent = benefit.details || '';
+		item.appendChild( summary );
+		item.appendChild( details );
+		list.prepend( item );
+	}
+
+	function resetChallengeProgressDisplay( button, data ) {
+		var meter = button ? button.previousElementSibling : null;
+		var fill = null;
+
+		if ( ! button || ! data ) {
+			return;
+		}
+
+		while ( meter && ! meter.classList.contains( 'klientoora-card-member-orders__meter' ) ) {
+			meter = meter.previousElementSibling;
+		}
+
+		fill = meter ? meter.querySelector( 'span' ) : null;
+
+		button.dataset.keepDisabled = 'yes';
+		button.dataset.originalText = data.next_button_text || button.textContent;
+		button.textContent = data.next_button_text || button.textContent;
+		button.disabled = true;
+
+		if ( fill ) {
+			fill.style.width = ( data.progress_percent || 0 ) + '%';
+		}
+	}
+
 	function setChallengeLoading( button, isLoading ) {
 		if ( ! button ) {
 			return;
@@ -521,7 +581,7 @@
 			button.textContent = button.dataset.originalText;
 		}
 
-		button.disabled = false;
+		button.disabled = button.dataset.keepDisabled === 'yes';
 	}
 
 	function sendChallengeRedemptionRequest( button ) {
@@ -571,6 +631,8 @@
 			} )
 			.then( function ( data ) {
 				setChallengeNotice( box, data.message || '', false );
+				addPersonalBenefit( data.personal_benefit );
+				resetChallengeProgressDisplay( button, data );
 				refreshWooCheckout();
 			} )
 			.catch( function ( error ) {

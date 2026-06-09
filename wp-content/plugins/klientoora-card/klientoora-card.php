@@ -30,7 +30,6 @@ require_once KLIENTOORA_CARD_PATH . 'includes/class-admin-main-page.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-admin-menu.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-checkout-redemption.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-coupon-validation.php';
-require_once KLIENTOORA_CARD_PATH . 'includes/class-member-discount.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-membership-status.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-points.php';
 require_once KLIENTOORA_CARD_PATH . 'includes/class-order-points.php';

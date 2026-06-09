@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Klientoora_Card_Checkout_Redemption {
 
+	const FIXED_MEMBER_COUPON_CODE = 'CLUB10';
+
 	/**
 	 * WooCommerce session key for redeemed points.
 	 *
@@ -36,7 +38,7 @@ class Klientoora_Card_Checkout_Redemption {
 	private $did_render_checkout_box = false;
 
 	/**
-	 * Renders the checkout points redemption box.
+	 * Renders the checkout benefits box.
 	 *
 	 * @return void
 	 */
@@ -45,49 +47,24 @@ class Klientoora_Card_Checkout_Redemption {
 			return;
 		}
 
-		if ( ! $this->can_current_user_redeem_points() ) {
+		if ( ! $this->can_current_user_use_checkout_benefits() ) {
 			return;
 		}
 
 		$this->did_render_checkout_box = true;
 
-		$this->maybe_default_to_points();
+		$this->set_session_redeemed_points( 0 );
+		$this->set_session_benefit_mode( 'coupon' );
+		$this->ensure_fixed_member_coupon_applied();
 
-		$user_id         = get_current_user_id();
-		$points_balance  = $this->get_user_points_balance( $user_id );
-		$redeemed_points = $this->get_session_redeemed_points();
-		$coupons         = $this->get_active_checkout_coupons();
+		$coupons         = $this->get_checkout_personal_coupons();
 		$applied_coupons = $this->get_applied_coupon_codes();
 		?>
 		<div class="klientoora-card-checkout-redemption" data-klientoora-card-checkout-redemption>
 			<h3><?php echo esc_html__( 'Klientoora Club', 'klientoora-card' ); ?></h3>
-
-			<?php if ( 0 < $redeemed_points ) : ?>
-				<p class="klientoora-card-checkout-redemption__applied" data-klientoora-card-redeemed-message>
-					<?php echo esc_html( $this->get_redeemed_points_message( $redeemed_points ) ); ?>
-				</p>
-			<?php else : ?>
-				<p class="klientoora-card-checkout-redemption__applied" data-klientoora-card-redeemed-message hidden></p>
-			<?php endif; ?>
+			<p class="klientoora-card-checkout-redemption__applied" data-klientoora-card-redeemed-message hidden></p>
 
 			<div class="klientoora-card-checkout-benefits">
-				<button
-					type="button"
-					class="klientoora-card-checkout-benefit<?php echo 0 < $redeemed_points ? ' is-selected' : ''; ?>"
-					data-klientoora-card-toggle-points
-					aria-pressed="<?php echo esc_attr( 0 < $redeemed_points ? 'true' : 'false' ); ?>"
-					<?php disabled( 0 === $points_balance ); ?>
-				>
-					<span class="klientoora-card-checkout-benefit__title"><?php echo esc_html__( 'יתרת נקודות', 'klientoora-card' ); ?></span>
-					<span class="klientoora-card-checkout-benefit__summary">
-						<strong data-klientoora-card-points-balance><?php echo esc_html( number_format_i18n( $points_balance ) ); ?></strong>
-						<?php echo esc_html__( 'נקודות זמינות', 'klientoora-card' ); ?>
-					</span>
-					<span class="klientoora-card-checkout-benefit__state" data-klientoora-card-points-state>
-						<?php echo esc_html( 0 < $redeemed_points ? __( 'נבחר', 'klientoora-card' ) : __( 'בחירה', 'klientoora-card' ) ); ?>
-					</span>
-				</button>
-
 				<?php foreach ( $coupons as $coupon ) : ?>
 					<?php
 					$coupon_code = $coupon->get_code();
@@ -100,13 +77,17 @@ class Klientoora_Card_Checkout_Redemption {
 						data-coupon-code="<?php echo esc_attr( $coupon_code ); ?>"
 						aria-pressed="<?php echo esc_attr( $is_applied ? 'true' : 'false' ); ?>"
 					>
-						<span class="klientoora-card-checkout-benefit__title"><?php echo esc_html( $coupon_code ); ?></span>
-						<span class="klientoora-card-checkout-benefit__summary"><?php echo esc_html( $this->get_coupon_summary( $coupon ) ); ?></span>
+						<span class="klientoora-card-checkout-benefit__title"><?php echo esc_html( $this->get_coupon_summary( $coupon ) ); ?></span>
+						<span class="klientoora-card-checkout-benefit__summary"><?php echo esc_html( $this->get_coupon_details( $coupon ) ); ?></span>
 						<span class="klientoora-card-checkout-benefit__state" data-klientoora-card-coupon-state>
 							<?php echo esc_html( $is_applied ? __( 'נבחר', 'klientoora-card' ) : __( 'בחירה', 'klientoora-card' ) ); ?>
 						</span>
 					</button>
 				<?php endforeach; ?>
+
+				<?php if ( empty( $coupons ) ) : ?>
+					<p class="klientoora-card-checkout-redemption__empty"><?php echo esc_html__( 'אין כרגע הטבות אישיות זמינות לבחירה.', 'klientoora-card' ); ?></p>
+				<?php endif; ?>
 			</div>
 
 			<div class="klientoora-card-checkout-redemption__notice" data-klientoora-card-redeem-notice hidden></div>
@@ -132,7 +113,7 @@ class Klientoora_Card_Checkout_Redemption {
 			return;
 		}
 
-		if ( ! $this->can_current_user_redeem_points() ) {
+		if ( ! $this->can_current_user_use_checkout_benefits() ) {
 			return;
 		}
 
@@ -222,7 +203,7 @@ class Klientoora_Card_Checkout_Redemption {
 	public function handle_apply_loyalty_coupon() {
 		check_ajax_referer( 'klientoora_card_apply_coupon', 'nonce' );
 
-		if ( ! $this->can_current_user_redeem_points() || ! function_exists( 'WC' ) || ! WC()->cart ) {
+		if ( ! $this->can_current_user_use_checkout_benefits() || ! function_exists( 'WC' ) || ! WC()->cart ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'לא ניתן להחיל קופון עבור משתמש זה.', 'klientoora-card' ),
@@ -243,38 +224,35 @@ class Klientoora_Card_Checkout_Redemption {
 			);
 		}
 
+		$this->set_session_benefit_mode( 'coupon' );
+		$this->set_session_redeemed_points( 0 );
+		$this->ensure_fixed_member_coupon_applied();
+		$this->ensure_coupon_can_stack_with_fixed_member_coupon( $coupon );
+
 		if ( WC()->cart->has_discount( $coupon_code ) ) {
 			WC()->cart->remove_coupon( $coupon_code );
-			$this->set_session_benefit_mode( 'points' );
-			$redeemable_points = $this->get_current_redeemable_points();
-			$this->set_session_redeemed_points( $redeemable_points );
 			WC()->cart->calculate_totals();
 
 			wp_send_json_success(
 				array(
 					'coupon_code'     => '',
-					'redeemed_points' => $redeemable_points,
-					'selected_mode'   => 'points',
-					'points_message'  => $this->get_redeemed_points_message( $redeemable_points ),
+					'redeemed_points' => 0,
+					'selected_mode'   => 'coupon',
+					'points_message'  => '',
 					'message'         => sprintf(
-						/* translators: %s is the removed coupon code. */
-						__( 'הקופון %s הוסר. מימוש הנקודות הופעל.', 'klientoora-card' ),
-						$coupon->get_code()
+						/* translators: %s is the selected coupon summary. */
+						__( 'ההטבה %s הוסרה.', 'klientoora-card' ),
+						$this->get_coupon_summary( $coupon )
 					),
 				)
 			);
 		}
 
-		$this->set_session_benefit_mode( 'coupon' );
-		$this->set_session_redeemed_points( 0 );
-		$this->remove_other_loyalty_coupons( $coupon_code );
+		$this->remove_other_personal_benefit_coupons( $coupon_code );
 
 		wc_clear_notices();
 
 		if ( ! WC()->cart->apply_coupon( $coupon_code ) ) {
-			$this->set_session_benefit_mode( 'points' );
-			$this->set_session_redeemed_points( $this->get_current_redeemable_points() );
-
 			wp_send_json_error(
 				array(
 					'message' => $this->get_checkout_coupon_error_message(),
@@ -292,12 +270,90 @@ class Klientoora_Card_Checkout_Redemption {
 				'selected_mode'   => 'coupon',
 				'points_message'  => '',
 				'message'         => sprintf(
-					/* translators: %s is the applied coupon code. */
-					__( 'הקופון %s הוחל בהצלחה.', 'klientoora-card' ),
-					$coupon->get_code()
+					/* translators: %s is the applied coupon summary. */
+					__( 'ההטבה %s הוחלה בהצלחה.', 'klientoora-card' ),
+					$this->get_coupon_summary( $coupon )
 				),
 			)
 		);
+	}
+
+	/**
+	 * Replaces checkout coupon codes with customer-friendly benefit labels.
+	 *
+	 * @param string    $label  Default WooCommerce label.
+	 * @param WC_Coupon $coupon Coupon object.
+	 *
+	 * @return string
+	 */
+	public function filter_checkout_coupon_label( $label, $coupon ) {
+		if ( ! $coupon || ! is_a( $coupon, 'WC_Coupon' ) ) {
+			return $label;
+		}
+
+		if ( 'yes' === $coupon->get_meta( '_klientoora_fixed_checkout_coupon' ) ) {
+			return __( 'הטבת מועדון קבועה', 'klientoora-card' );
+		}
+
+		if ( 'yes' === $coupon->get_meta( '_klientoora_challenge_coupon' ) ) {
+			return $this->get_coupon_summary( $coupon );
+		}
+
+		if ( 'yes' === $coupon->get_meta( '_loyalty_coupon' ) ) {
+			return $this->get_coupon_summary( $coupon );
+		}
+
+		return $label;
+	}
+
+	/**
+	 * Ensures the fixed member discount coupon is always applied at checkout.
+	 *
+	 * @return void
+	 */
+	public function ensure_fixed_member_coupon_applied() {
+		if ( is_admin() && ! wp_doing_ajax() ) {
+			return;
+		}
+
+		if ( ! $this->can_current_user_use_checkout_benefits() || ! function_exists( 'WC' ) || ! WC()->cart ) {
+			$this->set_session_redeemed_points( 0 );
+			return;
+		}
+
+		$this->set_session_benefit_mode( 'coupon' );
+		$this->set_session_redeemed_points( 0 );
+
+		$coupon = $this->get_fixed_member_coupon();
+
+		if ( ! $coupon || ! $this->is_checkout_coupon_active( $coupon ) ) {
+			return;
+		}
+
+		$coupon_code = wc_format_coupon_code( $coupon->get_code() );
+
+		if ( WC()->cart->has_discount( $coupon_code ) ) {
+			return;
+		}
+
+		wc_clear_notices();
+		WC()->cart->apply_coupon( $coupon_code );
+		wc_clear_notices();
+	}
+
+	/**
+	 * Restores the fixed member coupon when it is manually removed.
+	 *
+	 * @param string $coupon_code Removed coupon code.
+	 *
+	 * @return void
+	 */
+	public function restore_fixed_member_coupon_if_removed( $coupon_code ) {
+		if ( wc_format_coupon_code( $coupon_code ) !== wc_format_coupon_code( self::FIXED_MEMBER_COUPON_CODE ) ) {
+			return;
+		}
+
+		$this->ensure_fixed_member_coupon_applied();
 	}
 
 	/**
@@ -498,18 +554,27 @@ class Klientoora_Card_Checkout_Redemption {
 	}
 
 	/**
-	 * Checks whether the current user can redeem points.
+	 * Checks whether the current user can use checkout benefits.
 	 *
 	 * @return bool
 	 */
-	private function can_current_user_redeem_points() {
+	private function can_current_user_use_checkout_benefits() {
 		if ( ! is_user_logged_in() || ! function_exists( 'WC' ) ) {
 			return false;
 		}
 
-		$user_id = get_current_user_id();
+		return true;
+	}
 
-		return Klientoora_Card_Membership_Status::is_active( $user_id );
+	/**
+	 * Checks whether the current user can redeem points.
+	 *
+	 * Kept for older internal checkout-point methods that are no longer hooked.
+	 *
+	 * @return bool
+	 */
+	private function can_current_user_redeem_points() {
+		return $this->can_current_user_use_checkout_benefits();
 	}
 
 	/**
@@ -584,7 +649,7 @@ class Klientoora_Card_Checkout_Redemption {
 			return false;
 		}
 
-		foreach ( $this->get_active_checkout_coupons() as $coupon ) {
+		foreach ( $this->get_checkout_personal_coupons() as $coupon ) {
 			if ( WC()->cart->has_discount( wc_format_coupon_code( $coupon->get_code() ) ) ) {
 				return true;
 			}
@@ -594,20 +659,129 @@ class Klientoora_Card_Checkout_Redemption {
 	}
 
 	/**
-	 * Returns active loyalty coupons that should be shown at checkout.
+	 * Returns the fixed 10% member checkout coupon.
+	 *
+	 * @return WC_Coupon|null
+	 */
+	private function get_fixed_member_coupon() {
+		if ( ! class_exists( 'WC_Coupon' ) || ! function_exists( 'wc_get_coupon_id_by_code' ) ) {
+			return null;
+		}
+
+		$coupon_id = absint( wc_get_coupon_id_by_code( self::FIXED_MEMBER_COUPON_CODE ) );
+		$coupon    = $coupon_id ? new WC_Coupon( $coupon_id ) : new WC_Coupon();
+		$needs_save = ! $coupon_id;
+
+		if ( ! $coupon_id ) {
+			$coupon->set_code( self::FIXED_MEMBER_COUPON_CODE );
+			$coupon->set_status( 'publish' );
+			$coupon->set_description( __( 'הנחת מועדון קבועה בצ׳קאאוט', 'klientoora-card' ) );
+			$coupon->update_meta_data( '_loyalty_coupon', 'yes' );
+			$coupon->update_meta_data( '_loyalty_members_only', 'no' );
+			$coupon->update_meta_data( '_loyalty_show_in_popup', 'no' );
+			$coupon->update_meta_data( '_klientoora_fixed_checkout_coupon', 'yes' );
+		}
+
+		if ( 'publish' !== $coupon->get_status() ) {
+			$coupon->set_status( 'publish' );
+			$needs_save = true;
+		}
+
+		if ( 'percent' !== $coupon->get_discount_type() ) {
+			$coupon->set_discount_type( 'percent' );
+			$needs_save = true;
+		}
+
+		if ( 10.0 !== (float) $coupon->get_amount() ) {
+			$coupon->set_amount( 10 );
+			$needs_save = true;
+		}
+
+		if ( $coupon->get_individual_use() ) {
+			$coupon->set_individual_use( false );
+			$needs_save = true;
+		}
+
+		if ( $coupon->get_free_shipping() ) {
+			$coupon->set_free_shipping( false );
+			$needs_save = true;
+		}
+
+		if ( 0 !== absint( $coupon->get_usage_limit() ) ) {
+			$coupon->set_usage_limit( 0 );
+			$needs_save = true;
+		}
+
+		if ( 0 !== absint( $coupon->get_usage_limit_per_user() ) ) {
+			$coupon->set_usage_limit_per_user( 0 );
+			$needs_save = true;
+		}
+
+		if ( 'no' !== $coupon->get_meta( '_loyalty_members_only' ) ) {
+			$coupon->update_meta_data( '_loyalty_members_only', 'no' );
+			$needs_save = true;
+		}
+
+		if ( 'yes' !== $coupon->get_meta( '_klientoora_fixed_checkout_coupon' ) ) {
+			$coupon->update_meta_data( '_klientoora_fixed_checkout_coupon', 'yes' );
+			$needs_save = true;
+		}
+
+		if ( $needs_save ) {
+			$coupon_id = $coupon->save();
+		}
+
+		return $coupon_id ? new WC_Coupon( $coupon_id ) : null;
+	}
+
+	/**
+	 * Ensures the selected personal benefit can stack with the fixed checkout coupon.
+	 *
+	 * @param WC_Coupon $coupon Coupon object.
+	 *
+	 * @return void
+	 */
+	private function ensure_coupon_can_stack_with_fixed_member_coupon( $coupon ) {
+		if ( ! $coupon || ! is_a( $coupon, 'WC_Coupon' ) || ! $coupon->get_individual_use() ) {
+			return;
+		}
+
+		$coupon->set_individual_use( false );
+		$coupon->save();
+	}
+
+	/**
+	 * Returns active personal benefit coupons that should be shown at checkout.
 	 *
 	 * @return array<int, WC_Coupon>
 	 */
-	private function get_active_checkout_coupons() {
+	private function get_checkout_personal_coupons() {
 		if ( ! class_exists( 'WC_Coupon' ) ) {
+			return array();
+		}
+
+		$user_id = get_current_user_id();
+
+		if ( 0 >= $user_id ) {
 			return array();
 		}
 
 		$coupon_ids = get_posts(
 			array(
 				'fields'         => 'ids',
-				'meta_key'       => '_loyalty_coupon',
-				'meta_value'     => 'yes',
+				'meta_query'     => array(
+					'relation' => 'AND',
+					array(
+						'key'   => '_klientoora_challenge_coupon',
+						'value' => 'yes',
+					),
+					array(
+						'key'   => '_klientoora_challenge_user_id',
+						'value' => (string) $user_id,
+					),
+				),
+				'orderby'        => 'date',
+				'order'          => 'DESC',
 				'post_status'    => 'publish',
 				'post_type'      => 'shop_coupon',
 				'posts_per_page' => -1,
@@ -616,10 +790,6 @@ class Klientoora_Card_Checkout_Redemption {
 		$coupons    = array();
 
 		foreach ( $coupon_ids as $coupon_id ) {
-			if ( 'yes' !== get_post_meta( $coupon_id, '_loyalty_show_in_popup', true ) ) {
-				continue;
-			}
-
 			$coupon = new WC_Coupon( $coupon_id );
 
 			if ( $coupon->get_id() && $this->is_checkout_coupon_active( $coupon ) ) {
@@ -631,6 +801,15 @@ class Klientoora_Card_Checkout_Redemption {
 	}
 
 	/**
+	 * Returns active checkout coupons.
+	 *
+	 * @return array<int, WC_Coupon>
+	 */
+	private function get_active_checkout_coupons() {
+		return $this->get_checkout_personal_coupons();
+	}
+
+	/**
 	 * Returns an active checkout loyalty coupon by code.
 	 *
 	 * @param string $coupon_code Coupon code.
@@ -638,7 +817,7 @@ class Klientoora_Card_Checkout_Redemption {
 	 * @return WC_Coupon|null
 	 */
 	private function get_active_checkout_coupon_by_code( $coupon_code ) {
-		foreach ( $this->get_active_checkout_coupons() as $coupon ) {
+		foreach ( $this->get_checkout_personal_coupons() as $coupon ) {
 			if ( wc_format_coupon_code( $coupon->get_code() ) === $coupon_code ) {
 				return $coupon;
 			}
@@ -695,11 +874,22 @@ class Klientoora_Card_Checkout_Redemption {
 	 * @return void
 	 */
 	private function remove_other_loyalty_coupons( $selected_coupon_code ) {
+		$this->remove_other_personal_benefit_coupons( $selected_coupon_code );
+	}
+
+	/**
+	 * Removes other personal benefit coupons before applying a selected one.
+	 *
+	 * @param string $selected_coupon_code Selected coupon code.
+	 *
+	 * @return void
+	 */
+	private function remove_other_personal_benefit_coupons( $selected_coupon_code ) {
 		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 			return;
 		}
 
-		foreach ( $this->get_active_checkout_coupons() as $coupon ) {
+		foreach ( $this->get_checkout_personal_coupons() as $coupon ) {
 			$coupon_code = wc_format_coupon_code( $coupon->get_code() );
 
 			if ( $selected_coupon_code !== $coupon_code && WC()->cart->has_discount( $coupon_code ) ) {
@@ -736,6 +926,31 @@ class Klientoora_Card_Checkout_Redemption {
 			__( '%s הנחה', 'klientoora-card' ),
 			function_exists( 'wc_price' ) ? wp_strip_all_tags( wc_price( $amount ) ) : number_format_i18n( (float) $amount )
 		);
+	}
+
+	/**
+	 * Returns a short display detail for a coupon.
+	 *
+	 * @param WC_Coupon $coupon Coupon object.
+	 *
+	 * @return string
+	 */
+	private function get_coupon_details( $coupon ) {
+		$description = trim( wp_strip_all_tags( $coupon->get_description() ) );
+
+		if ( '' !== $description ) {
+			return $description;
+		}
+
+		if ( $coupon->get_date_expires() ) {
+			return sprintf(
+				/* translators: %s is a formatted coupon expiry date. */
+				__( 'בתוקף עד %s', 'klientoora-card' ),
+				wp_date( get_option( 'date_format' ), $coupon->get_date_expires()->getTimestamp() )
+			);
+		}
+
+		return __( 'הטבה אישית זמינה להזמנה זו.', 'klientoora-card' );
 	}
 
 	/**

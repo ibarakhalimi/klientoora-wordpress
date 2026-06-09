@@ -28,12 +28,19 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 			</div>
 
 			<nav class="klientoora-admin-main__nav">
-				<a class="is-active" href="#dashboard"><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></a>
-				<a href="#orders"><?php echo esc_html__( 'הזמנות', 'klientoora-card' ); ?></a>
-				<a href="#products"><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></a>
-				<a href="#members"><?php echo esc_html__( 'לקוחות', 'klientoora-card' ); ?></a>
-				<a href="#club-activity"><?php echo esc_html__( 'פעילות מועדון', 'klientoora-card' ); ?></a>
-				<a href="#settings"><?php echo esc_html__( 'הגדרות', 'klientoora-card' ); ?></a>
+				<a class="is-active" href="#dashboard" data-klientoora-main-nav><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></a>
+				<a href="#orders" data-klientoora-main-nav><?php echo esc_html__( 'הזמנות', 'klientoora-card' ); ?></a>
+				<a href="#products" data-klientoora-main-nav><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></a>
+				<a href="#members" data-klientoora-main-nav><?php echo esc_html__( 'חברי מועדון', 'klientoora-card' ); ?></a>
+				<div class="klientoora-admin-main__nav-group">
+					<a href="#club-activity" data-klientoora-main-nav><?php echo esc_html__( 'פעילות מועדון', 'klientoora-card' ); ?></a>
+					<div class="klientoora-admin-main__subnav" aria-label="<?php echo esc_attr__( 'תתי תפריט פעילות מועדון', 'klientoora-card' ); ?>">
+						<a href="#club-coupons" data-klientoora-main-nav><?php echo esc_html__( 'ניהול קופונים', 'klientoora-card' ); ?></a>
+						<a href="#challenges" data-klientoora-main-nav><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></a>
+						<a href="#point-redemptions" data-klientoora-main-nav><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></a>
+					</div>
+				</div>
+				<a href="#settings" data-klientoora-main-nav><?php echo esc_html__( 'הגדרות', 'klientoora-card' ); ?></a>
 			</nav>
 		</aside>
 
@@ -64,6 +71,18 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 
 				<section class="klientoora-admin-main__panel" id="club-activity-panel" data-klientoora-admin-main-panel="club-activity" hidden>
 					<?php $klientoora_admin_menu->render_club_activity_admin_main_view(); ?>
+				</section>
+
+				<section class="klientoora-admin-main__panel" id="club-coupons-panel" data-klientoora-admin-main-panel="club-coupons" hidden>
+					<?php $klientoora_admin_menu->render_club_coupons_admin_main_view(); ?>
+				</section>
+
+				<section class="klientoora-admin-main__panel" id="challenges-panel" data-klientoora-admin-main-panel="challenges" hidden>
+					<?php $klientoora_admin_menu->render_challenges_admin_main_view(); ?>
+				</section>
+
+				<section class="klientoora-admin-main__panel" id="point-redemptions-panel" data-klientoora-admin-main-panel="point-redemptions" hidden>
+					<?php $klientoora_admin_menu->render_point_redemptions_admin_main_view(); ?>
 				</section>
 
 				<section class="klientoora-admin-main__panel" id="settings-panel" data-klientoora-admin-main-panel="settings" hidden>

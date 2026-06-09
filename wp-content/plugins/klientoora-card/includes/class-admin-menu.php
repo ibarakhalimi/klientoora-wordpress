@@ -123,16 +123,6 @@ class Klientoora_Card_Admin_Menu {
 		);
 
 		register_setting(
-			'klientoora_card_settings',
-			'loyalty_member_discount_percentage',
-			array(
-				'type'              => 'number',
-				'sanitize_callback' => array( $this, 'sanitize_percentage' ),
-				'default'           => 0,
-			)
-		);
-
-		register_setting(
 			'klientoora_card_challenges',
 			'klientoora_card_order_challenge_goal',
 			array(
@@ -202,20 +192,6 @@ class Klientoora_Card_Admin_Menu {
 			'klientoora_card_points_section'
 		);
 
-		add_settings_section(
-			'klientoora_card_benefits_section',
-			__( 'הטבות ומבצעים', 'klientoora-card' ),
-			array( $this, 'render_benefits_section_description' ),
-			'klientoora-card-settings'
-		);
-
-		add_settings_field(
-			'loyalty_member_discount_percentage',
-			__( 'Fixed member discount percentage', 'klientoora-card' ),
-			array( $this, 'render_member_discount_percentage_field' ),
-			'klientoora-card-settings',
-			'klientoora_card_benefits_section'
-		);
 	}
 
 	/**
@@ -454,7 +430,7 @@ class Klientoora_Card_Admin_Menu {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			?>
 			<div class="klientoora-admin-main-members">
-				<h2><?php echo esc_html__( 'Members', 'klientoora-card' ); ?></h2>
+				<h2><?php echo esc_html__( 'חברי מועדון', 'klientoora-card' ); ?></h2>
 				<p><?php echo esc_html__( 'You do not have permission to view members.', 'klientoora-card' ); ?></p>
 			</div>
 			<?php
@@ -468,13 +444,13 @@ class Klientoora_Card_Admin_Menu {
 		<div class="klientoora-admin-main-members">
 			<header class="klientoora-admin-main-members__header">
 				<div>
-					<h2><?php echo esc_html__( 'Members', 'klientoora-card' ); ?></h2>
+					<h2><?php echo esc_html__( 'חברי מועדון', 'klientoora-card' ); ?></h2>
 					<p>
 						<?php
 						echo esc_html(
 							sprintf(
 								/* translators: %d is the number of active loyalty members. */
-								__( 'Active members: %d', 'klientoora-card' ),
+								__( 'חברי מועדון פעילים: %d', 'klientoora-card' ),
 								count( $members )
 							)
 						);
@@ -550,32 +526,221 @@ class Klientoora_Card_Admin_Menu {
 			<header class="klientoora-admin-main-club-activity__header">
 				<div>
 					<h2><?php echo esc_html__( 'פעילות מועדון', 'klientoora-card' ); ?></h2>
-					<p><?php echo esc_html__( 'Club Coupons, challenges, and point redemptions.', 'klientoora-card' ); ?></p>
+					<p><?php echo esc_html__( 'תקציר פעילות מתוך ניהול קופונים, ניהול אתגרים ומימוש נקודות.', 'klientoora-card' ); ?></p>
+				</div>
+			</header>
+
+			<?php $this->render_admin_main_club_activity_coupons_summary(); ?>
+			<?php $this->render_admin_main_club_activity_challenges_summary(); ?>
+			<?php $this->render_admin_main_club_activity_points_summary(); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the standalone club coupons admin-main page.
+	 *
+	 * @return void
+	 */
+	public function render_club_coupons_admin_main_view() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="klientoora-admin-main-club-activity">
+			<header class="klientoora-admin-main-club-activity__header">
+				<div>
+					<h2><?php echo esc_html__( 'ניהול קופונים', 'klientoora-card' ); ?></h2>
+					<p><?php echo esc_html__( 'ניהול קופוני המועדון שמבוססים על WooCommerce.', 'klientoora-card' ); ?></p>
 				</div>
 			</header>
 
 			<?php $this->render_admin_main_coupon_notice(); ?>
+			<?php $this->render_admin_main_club_coupons_view(); ?>
+		</div>
+		<?php
+	}
 
-			<div class="klientoora-admin-main-club-activity__tabs" role="tablist" aria-label="<?php echo esc_attr__( 'Club activity sections', 'klientoora-card' ); ?>">
-				<button class="is-active" type="button" role="tab" aria-selected="true" data-klientoora-club-activity-tab="club-coupons"><?php echo esc_html__( 'ניהול קופונים', 'klientoora-card' ); ?></button>
-				<button type="button" role="tab" aria-selected="false" data-klientoora-club-activity-tab="challenges"><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></button>
-				<button type="button" role="tab" aria-selected="false" data-klientoora-club-activity-tab="point-redemptions"><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></button>
+	/**
+	 * Renders the standalone challenges admin-main page.
+	 *
+	 * @return void
+	 */
+	public function render_challenges_admin_main_view() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="klientoora-admin-main-club-activity">
+			<header class="klientoora-admin-main-club-activity__header">
+				<div>
+					<h2><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></h2>
+					<p><?php echo esc_html__( 'הגדרת יעדי רכישות והטבות ללקוחות המועדון.', 'klientoora-card' ); ?></p>
+				</div>
+			</header>
+
+			<?php $this->render_admin_main_challenge_notice(); ?>
+			<?php $this->render_admin_main_challenges_view(); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the standalone point redemptions admin-main page.
+	 *
+	 * @return void
+	 */
+	public function render_point_redemptions_admin_main_view() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="klientoora-admin-main-club-activity">
+			<header class="klientoora-admin-main-club-activity__header">
+				<div>
+					<h2><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></h2>
+					<p><?php echo esc_html__( 'ניהול מוצרים שניתן לממש בנקודות ואחוז צבירה בכל קניה.', 'klientoora-card' ); ?></p>
+				</div>
+			</header>
+
+			<?php $this->render_admin_main_product_redemption_notice(); ?>
+			<?php $this->render_admin_main_product_redemptions_view(); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the coupons summary card for club activity.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_club_activity_coupons_summary() {
+		if ( ! $this->is_woocommerce_active() ) {
+			?>
+			<section class="klientoora-admin-main-club-summary">
+				<div class="klientoora-admin-main-club-activity__section-heading">
+					<h3><?php echo esc_html__( 'קופונים פעילים', 'klientoora-card' ); ?></h3>
+					<span>0</span>
+				</div>
+				<p class="klientoora-admin-main-club-activity__empty"><?php echo esc_html__( 'WooCommerce is not active. Club Coupons are disabled until WooCommerce is available.', 'klientoora-card' ); ?></p>
+				<a class="klientoora-admin-main-club-summary__button" href="#club-coupons" data-klientoora-main-nav><?php echo esc_html__( 'ניהול קופונים', 'klientoora-card' ); ?></a>
+			</section>
+			<?php
+			return;
+		}
+
+		$active_coupons = $this->get_active_loyalty_coupons( $this->get_loyalty_coupons() );
+		?>
+		<section class="klientoora-admin-main-club-summary">
+			<div class="klientoora-admin-main-club-activity__section-heading">
+				<h3><?php echo esc_html__( 'קופונים פעילים', 'klientoora-card' ); ?></h3>
+				<span><?php echo esc_html( number_format_i18n( count( $active_coupons ) ) ); ?></span>
 			</div>
 
-			<section class="klientoora-admin-main-club-activity__panel" data-klientoora-club-activity-panel="club-coupons">
-				<?php $this->render_admin_main_club_coupons_view(); ?>
-			</section>
+			<?php $this->render_admin_main_active_coupons_section( $active_coupons, 'summary' ); ?>
 
-			<section class="klientoora-admin-main-club-activity__panel" data-klientoora-club-activity-panel="challenges" hidden>
-				<?php $this->render_admin_main_challenge_notice(); ?>
-				<?php $this->render_admin_main_challenges_view(); ?>
-			</section>
+			<a class="klientoora-admin-main-club-summary__button" href="#club-coupons" data-klientoora-main-nav><?php echo esc_html__( 'ניהול קופונים', 'klientoora-card' ); ?></a>
+		</section>
+		<?php
+	}
 
-			<section class="klientoora-admin-main-club-activity__panel" data-klientoora-club-activity-panel="point-redemptions" hidden>
-				<?php $this->render_admin_main_product_redemption_notice(); ?>
-				<?php $this->render_admin_main_product_redemptions_view(); ?>
-			</section>
-		</div>
+	/**
+	 * Renders the challenges summary card for club activity.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_club_activity_challenges_summary() {
+		$order_goal         = max( 1, absint( get_option( 'klientoora_card_order_challenge_goal', 5 ) ) );
+		$order_coupon_id    = absint( get_option( 'klientoora_card_order_challenge_coupon_id', 0 ) );
+		$spend_goal         = $this->sanitize_spend_challenge_goal( get_option( 'klientoora_card_spend_challenge_goal', 0 ) );
+		$spend_coupon_id    = absint( get_option( 'klientoora_card_spend_challenge_coupon_id', 0 ) );
+		$spend_goal_label   = function_exists( 'wc_price' ) ? wp_strip_all_tags( wc_price( $spend_goal ) ) : number_format_i18n( $spend_goal, 2 );
+		$order_coupon_label = $this->get_admin_main_challenge_coupon_label( $order_coupon_id );
+		$spend_coupon_label = $this->get_admin_main_challenge_coupon_label( $spend_coupon_id );
+		?>
+		<section class="klientoora-admin-main-club-summary">
+			<div class="klientoora-admin-main-club-activity__section-heading">
+				<h3><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></h3>
+				<span>2</span>
+			</div>
+
+			<div class="klientoora-admin-main-club-summary__items">
+				<article class="klientoora-admin-main-club-summary__item">
+					<span><?php echo esc_html__( 'אתגר מספר הזמנות', 'klientoora-card' ); ?></span>
+					<strong>
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %s is the order-count challenge goal. */
+								__( '%s הזמנות', 'klientoora-card' ),
+								number_format_i18n( $order_goal )
+							)
+						);
+						?>
+					</strong>
+					<p><?php echo esc_html( $order_coupon_label ); ?></p>
+				</article>
+
+				<article class="klientoora-admin-main-club-summary__item">
+					<span><?php echo esc_html__( 'אתגר סכום הזמנות', 'klientoora-card' ); ?></span>
+					<strong><?php echo esc_html( $spend_goal_label ); ?></strong>
+					<p><?php echo esc_html( $spend_coupon_label ); ?></p>
+				</article>
+			</div>
+
+			<a class="klientoora-admin-main-club-summary__button" href="#challenges" data-klientoora-main-nav><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></a>
+		</section>
+		<?php
+	}
+
+	/**
+	 * Renders the point redemptions summary card for club activity.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_club_activity_points_summary() {
+		$earning_percentage = $this->sanitize_points_earning_percentage( get_option( 'klientoora_card_points_earning_percentage', 10 ) );
+		$earning_decimals   = 0.0 === fmod( $earning_percentage, 1.0 ) ? 0 : 2;
+		$points_totals      = $this->get_admin_main_customer_points_totals();
+		?>
+		<section class="klientoora-admin-main-club-summary">
+			<div class="klientoora-admin-main-club-activity__section-heading">
+				<h3><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></h3>
+				<span><?php echo esc_html__( 'נקודות', 'klientoora-card' ); ?></span>
+			</div>
+
+			<div class="klientoora-admin-main-club-summary__items">
+				<article class="klientoora-admin-main-club-summary__item">
+					<span><?php echo esc_html__( 'אחוז צבירה', 'klientoora-card' ); ?></span>
+					<strong>
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %s is the configured points earning percentage. */
+								__( '%s%%', 'klientoora-card' ),
+								number_format_i18n( $earning_percentage, $earning_decimals )
+							)
+						);
+						?>
+					</strong>
+					<p><?php echo esc_html__( 'בכל קניה של חבר מועדון', 'klientoora-card' ); ?></p>
+				</article>
+
+				<article class="klientoora-admin-main-club-summary__item">
+					<span><?php echo esc_html__( 'נקודות שמומשו', 'klientoora-card' ); ?></span>
+					<strong><?php echo esc_html( number_format_i18n( $points_totals['redeemed'] ) ); ?></strong>
+					<p><?php echo esc_html__( 'סך כל הנקודות שמומשו על ידי כלל הלקוחות', 'klientoora-card' ); ?></p>
+				</article>
+
+				<article class="klientoora-admin-main-club-summary__item">
+					<span><?php echo esc_html__( 'נקודות זמינות', 'klientoora-card' ); ?></span>
+					<strong><?php echo esc_html( number_format_i18n( $points_totals['available'] ) ); ?></strong>
+					<p><?php echo esc_html__( 'סך הנקודות שעדיין ברשות הלקוחות', 'klientoora-card' ); ?></p>
+				</article>
+			</div>
+
+			<a class="klientoora-admin-main-club-summary__button" href="#point-redemptions" data-klientoora-main-nav><?php echo esc_html__( 'ניהול נקודות', 'klientoora-card' ); ?></a>
+		</section>
 		<?php
 	}
 
@@ -585,8 +750,6 @@ class Klientoora_Card_Admin_Menu {
 	 * @return void
 	 */
 	private function render_admin_main_club_coupons_view() {
-		$this->render_admin_main_member_discount_section();
-
 		if ( ! $this->is_woocommerce_active() ) {
 			?>
 			<p class="klientoora-admin-main-club-activity__empty"><?php echo esc_html__( 'WooCommerce is not active. Club Coupons are disabled until WooCommerce is available.', 'klientoora-card' ); ?></p>
@@ -614,21 +777,19 @@ class Klientoora_Card_Admin_Menu {
 			<?php endforeach; ?>
 		</div>
 
-		<details class="klientoora-admin-main-coupons-manual">
-			<summary><?php echo esc_html__( 'הוספת קופון ידנית', 'klientoora-card' ); ?></summary>
-			<?php $this->render_admin_main_manual_coupon_form(); ?>
-		</details>
+		<?php $this->render_admin_main_manual_coupon_button(); ?>
 		<?php
 	}
 
 	/**
 	 * Renders active club coupons in the standalone admin view.
 	 *
-	 * @param array<int, WC_Coupon> $coupons Active loyalty coupons.
+	 * @param array<int, WC_Coupon> $coupons       Active loyalty coupons.
+	 * @param string                $dialog_prefix Dialog ID prefix.
 	 *
 	 * @return void
 	 */
-	private function render_admin_main_active_coupons_section( $coupons ) {
+	private function render_admin_main_active_coupons_section( $coupons, $dialog_prefix = 'active' ) {
 		if ( empty( $coupons ) ) {
 			?>
 			<p class="klientoora-admin-main-club-activity__empty"><?php echo esc_html__( 'אין כרגע קופונים פעילים.', 'klientoora-card' ); ?></p>
@@ -638,45 +799,9 @@ class Klientoora_Card_Admin_Menu {
 		?>
 		<div class="klientoora-admin-main-coupons-bank">
 			<?php foreach ( $coupons as $coupon ) : ?>
-				<?php $this->render_admin_main_active_coupon_card( $coupon ); ?>
+				<?php $this->render_admin_main_active_coupon_card( $coupon, $dialog_prefix ); ?>
 			<?php endforeach; ?>
 		</div>
-		<?php
-	}
-
-	/**
-	 * Renders the synced fixed member discount setting for admin-main.
-	 *
-	 * @return void
-	 */
-	private function render_admin_main_member_discount_section() {
-		$percentage = $this->sanitize_percentage( get_option( 'loyalty_member_discount_percentage', 0 ) );
-		?>
-		<section class="klientoora-admin-main-member-discount">
-			<div>
-				<h3><?php echo esc_html__( 'הנחה קבועה לחברי מועדון', 'klientoora-card' ); ?></h3>
-				<p><?php echo esc_html__( 'השדה הזה מסונכרן עם Fixed member discount percentage בהגדרות התוסף ומחיל את ההנחה בעגלה לחברי מועדון.', 'klientoora-card' ); ?></p>
-			</div>
-			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
-				<?php wp_nonce_field( 'klientoora_card_save_member_discount' ); ?>
-				<input type="hidden" name="action" value="klientoora_card_save_member_discount" />
-				<input type="hidden" name="klientoora_coupons_return" value="admin-main" />
-				<label for="klientoora_admin_main_member_discount"><?php echo esc_html__( 'אחוז הנחה קבוע', 'klientoora-card' ); ?></label>
-				<div class="klientoora-admin-main-member-discount__control">
-					<input
-						type="number"
-						id="klientoora_admin_main_member_discount"
-						name="loyalty_member_discount_percentage"
-						min="0"
-						max="100"
-						step="0.01"
-						value="<?php echo esc_attr( $percentage ); ?>"
-					/>
-					<span>%</span>
-				</div>
-				<button type="submit"><?php echo esc_html__( 'שמירת הנחה', 'klientoora-card' ); ?></button>
-			</form>
-		</section>
 		<?php
 	}
 
@@ -705,12 +830,13 @@ class Klientoora_Card_Admin_Menu {
 	/**
 	 * Renders one active coupon card for admin-main.
 	 *
-	 * @param WC_Coupon $coupon Coupon object.
+	 * @param WC_Coupon $coupon        Coupon object.
+	 * @param string    $dialog_prefix Dialog ID prefix.
 	 *
 	 * @return void
 	 */
-	private function render_admin_main_active_coupon_card( $coupon ) {
-		$dialog_id = 'klientoora-admin-main-active-coupon-' . absint( $coupon->get_id() );
+	private function render_admin_main_active_coupon_card( $coupon, $dialog_prefix = 'active' ) {
+		$dialog_id = 'klientoora-admin-main-' . sanitize_html_class( $dialog_prefix ) . '-coupon-' . absint( $coupon->get_id() );
 		$values    = $this->get_admin_main_coupon_values_from_coupon( $coupon );
 		$discount  = $this->format_admin_main_coupon_discount_summary( $coupon );
 		$expiry    = $this->format_admin_main_coupon_expiry( $coupon );
@@ -718,11 +844,11 @@ class Klientoora_Card_Admin_Menu {
 		<article class="klientoora-admin-main-coupon-card is-active">
 			<button type="button" data-klientoora-coupon-dialog-trigger="<?php echo esc_attr( $dialog_id ); ?>">
 				<span class="klientoora-admin-main-coupon-card__status"><?php echo esc_html__( 'פעיל', 'klientoora-card' ); ?></span>
-				<strong><?php echo esc_html( $coupon->get_code() ); ?></strong>
+				<strong><?php echo esc_html( $discount ); ?></strong>
 				<span class="klientoora-admin-main-coupon-card__meta">
 					<span>
-						<b><?php echo esc_html__( 'מהות ההנחה', 'klientoora-card' ); ?></b>
-						<?php echo esc_html( $discount ); ?>
+						<b><?php echo esc_html__( 'קוד קופון', 'klientoora-card' ); ?></b>
+						<?php echo esc_html( $coupon->get_code() ); ?>
 					</span>
 					<span>
 						<b><?php echo esc_html__( 'תוקף קופון', 'klientoora-card' ); ?></b>
@@ -803,115 +929,83 @@ class Klientoora_Card_Admin_Menu {
 		?>
 		<div class="klientoora-admin-main-coupon-dialog__grid">
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-coupon-code"><?php echo esc_html__( 'Coupon code', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-coupon-code"><?php echo esc_html__( 'קוד קופון', 'klientoora-card' ); ?></label>
 				<input type="text" id="<?php echo esc_attr( $id_prefix ); ?>-coupon-code" name="coupon_code" value="<?php echo esc_attr( $values['coupon_code'] ); ?>" required />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-discount-type"><?php echo esc_html__( 'Discount type', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-discount-type"><?php echo esc_html__( 'סוג הנחה', 'klientoora-card' ); ?></label>
 				<select id="<?php echo esc_attr( $id_prefix ); ?>-discount-type" name="discount_type">
 					<?php foreach ( $this->get_allowed_coupon_discount_types() as $type ) : ?>
-						<option value="<?php echo esc_attr( $type ); ?>" <?php selected( $values['discount_type'], $type ); ?>><?php echo esc_html( $type ); ?></option>
+						<option value="<?php echo esc_attr( $type ); ?>" <?php selected( $values['discount_type'], $type ); ?>><?php echo esc_html( $this->get_coupon_discount_type_label( $type ) ); ?></option>
 					<?php endforeach; ?>
 				</select>
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-amount"><?php echo esc_html__( 'Coupon amount', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-amount"><?php echo esc_html__( 'גובה ההנחה', 'klientoora-card' ); ?></label>
 				<input type="number" id="<?php echo esc_attr( $id_prefix ); ?>-amount" name="amount" value="<?php echo esc_attr( $values['amount'] ); ?>" min="0" step="0.01" />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-usage-limit"><?php echo esc_html__( 'Usage limit', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-usage-limit"><?php echo esc_html__( 'מגבלת שימושים כללית', 'klientoora-card' ); ?></label>
 				<input type="number" id="<?php echo esc_attr( $id_prefix ); ?>-usage-limit" name="usage_limit" value="<?php echo esc_attr( $values['usage_limit'] ); ?>" min="0" step="1" />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-usage-limit-per-user"><?php echo esc_html__( 'Usage limit per user', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-usage-limit-per-user"><?php echo esc_html__( 'מגבלת שימוש ללקוח', 'klientoora-card' ); ?></label>
 				<input type="number" id="<?php echo esc_attr( $id_prefix ); ?>-usage-limit-per-user" name="usage_limit_per_user" value="<?php echo esc_attr( $values['usage_limit_per_user'] ); ?>" min="0" step="1" />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-expiry-date"><?php echo esc_html__( 'Expiry date', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-expiry-date"><?php echo esc_html__( 'תאריך תפוגה', 'klientoora-card' ); ?></label>
 				<input type="date" id="<?php echo esc_attr( $id_prefix ); ?>-expiry-date" name="expiry_date" value="<?php echo esc_attr( $values['expiry_date'] ); ?>" />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-minimum-spend"><?php echo esc_html__( 'Minimum spend', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-minimum-spend"><?php echo esc_html__( 'מינימום רכישה', 'klientoora-card' ); ?></label>
 				<input type="number" id="<?php echo esc_attr( $id_prefix ); ?>-minimum-spend" name="minimum_spend" value="<?php echo esc_attr( $values['minimum_spend'] ); ?>" min="0" step="0.01" />
 			</div>
 			<div>
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-maximum-spend"><?php echo esc_html__( 'Maximum spend', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-maximum-spend"><?php echo esc_html__( 'מקסימום רכישה', 'klientoora-card' ); ?></label>
 				<input type="number" id="<?php echo esc_attr( $id_prefix ); ?>-maximum-spend" name="maximum_spend" value="<?php echo esc_attr( $values['maximum_spend'] ); ?>" min="0" step="0.01" />
 			</div>
 			<div class="is-wide">
-				<label for="<?php echo esc_attr( $id_prefix ); ?>-description"><?php echo esc_html__( 'Description', 'klientoora-card' ); ?></label>
+				<label for="<?php echo esc_attr( $id_prefix ); ?>-description"><?php echo esc_html__( 'תיאור', 'klientoora-card' ); ?></label>
 				<textarea id="<?php echo esc_attr( $id_prefix ); ?>-description" name="description" rows="3"><?php echo esc_textarea( $values['description'] ); ?></textarea>
 			</div>
 			<div class="is-wide klientoora-admin-main-coupon-dialog__checks">
-				<label><input type="checkbox" name="free_shipping" value="yes" <?php checked( 'yes', $values['free_shipping'] ); ?> /> <?php echo esc_html__( 'Allow free shipping', 'klientoora-card' ); ?></label>
-				<label><input type="checkbox" name="members_only" value="yes" <?php checked( 'yes', $values['members_only'] ); ?> /> <?php echo esc_html__( 'Members only', 'klientoora-card' ); ?></label>
-				<label><input type="checkbox" name="show_in_popup" value="yes" <?php checked( 'yes', $values['show_in_popup'] ); ?> /> <?php echo esc_html__( 'Show in loyalty popup', 'klientoora-card' ); ?></label>
+				<label><input type="checkbox" name="free_shipping" value="yes" <?php checked( 'yes', $values['free_shipping'] ); ?> /> <?php echo esc_html__( 'משלוח חינם', 'klientoora-card' ); ?></label>
+				<label><input type="checkbox" name="members_only" value="yes" <?php checked( 'yes', $values['members_only'] ); ?> /> <?php echo esc_html__( 'לחברי מועדון בלבד', 'klientoora-card' ); ?></label>
+				<label><input type="checkbox" name="show_in_popup" value="yes" <?php checked( 'yes', $values['show_in_popup'] ); ?> /> <?php echo esc_html__( 'הצגה בפאנל המועדון', 'klientoora-card' ); ?></label>
 			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Renders a clean manual coupon form for admin-main.
+	 * Renders the manual coupon creation trigger for admin-main.
 	 *
 	 * @return void
 	 */
-	private function render_admin_main_manual_coupon_form() {
+	private function render_admin_main_manual_coupon_button() {
+		$dialog_id = 'klientoora-admin-main-manual-coupon';
+		$values    = array(
+			'title'                => __( 'הוספת קופון ידנית', 'klientoora-card' ),
+			'coupon_code'          => '',
+			'description'          => '',
+			'discount_type'        => 'fixed_cart',
+			'amount'               => '',
+			'free_shipping'        => 'no',
+			'expiry_date'          => '',
+			'minimum_spend'        => '',
+			'maximum_spend'        => '',
+			'usage_limit'          => '',
+			'usage_limit_per_user' => '',
+			'members_only'         => 'yes',
+			'show_in_popup'        => 'yes',
+		);
 		?>
-		<form class="klientoora-admin-main-coupon-manual-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
-			<?php wp_nonce_field( 'klientoora_card_save_coupon' ); ?>
-			<input type="hidden" name="action" value="klientoora_card_save_coupon" />
-			<input type="hidden" name="klientoora_coupons_return" value="admin-main" />
-
-			<div>
-				<label for="klientoora_admin_main_coupon_code"><?php echo esc_html__( 'Coupon code', 'klientoora-card' ); ?></label>
-				<input type="text" id="klientoora_admin_main_coupon_code" name="coupon_code" required />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_discount_type"><?php echo esc_html__( 'Discount type', 'klientoora-card' ); ?></label>
-				<select id="klientoora_admin_main_coupon_discount_type" name="discount_type">
-					<?php foreach ( $this->get_allowed_coupon_discount_types() as $type ) : ?>
-						<option value="<?php echo esc_attr( $type ); ?>"><?php echo esc_html( $type ); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_amount"><?php echo esc_html__( 'Coupon amount', 'klientoora-card' ); ?></label>
-				<input type="number" id="klientoora_admin_main_coupon_amount" name="amount" min="0" step="0.01" />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_usage_limit"><?php echo esc_html__( 'Usage limit', 'klientoora-card' ); ?></label>
-				<input type="number" id="klientoora_admin_main_coupon_usage_limit" name="usage_limit" min="0" step="1" />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_usage_limit_per_user"><?php echo esc_html__( 'Usage limit per user', 'klientoora-card' ); ?></label>
-				<input type="number" id="klientoora_admin_main_coupon_usage_limit_per_user" name="usage_limit_per_user" min="0" step="1" />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_expiry_date"><?php echo esc_html__( 'Expiry date', 'klientoora-card' ); ?></label>
-				<input type="date" id="klientoora_admin_main_coupon_expiry_date" name="expiry_date" />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_minimum_spend"><?php echo esc_html__( 'Minimum spend', 'klientoora-card' ); ?></label>
-				<input type="number" id="klientoora_admin_main_coupon_minimum_spend" name="minimum_spend" min="0" step="0.01" />
-			</div>
-			<div>
-				<label for="klientoora_admin_main_coupon_maximum_spend"><?php echo esc_html__( 'Maximum spend', 'klientoora-card' ); ?></label>
-				<input type="number" id="klientoora_admin_main_coupon_maximum_spend" name="maximum_spend" min="0" step="0.01" />
-			</div>
-			<div class="is-wide">
-				<label for="klientoora_admin_main_coupon_description"><?php echo esc_html__( 'Description', 'klientoora-card' ); ?></label>
-				<textarea id="klientoora_admin_main_coupon_description" name="description" rows="2"></textarea>
-			</div>
-			<div class="is-wide klientoora-admin-main-coupon-manual-form__checks">
-				<label><input type="checkbox" name="free_shipping" value="yes" /> <?php echo esc_html__( 'Allow free shipping', 'klientoora-card' ); ?></label>
-				<label><input type="checkbox" name="members_only" value="yes" /> <?php echo esc_html__( 'Members only', 'klientoora-card' ); ?></label>
-				<label><input type="checkbox" name="show_in_popup" value="yes" checked /> <?php echo esc_html__( 'Show in loyalty popup', 'klientoora-card' ); ?></label>
-			</div>
-			<div class="is-wide">
-				<button type="submit"><?php echo esc_html__( 'הוספת קופון', 'klientoora-card' ); ?></button>
-			</div>
-		</form>
+		<div class="klientoora-admin-main-coupons-manual">
+			<button type="button" data-klientoora-coupon-dialog-trigger="<?php echo esc_attr( $dialog_id ); ?>">
+				<?php echo esc_html__( 'הוספת קופון ידנית', 'klientoora-card' ); ?>
+			</button>
+		</div>
+		<?php $this->render_admin_main_coupon_dialog( $dialog_id, $values, null, __( 'הוספת קופון', 'klientoora-card' ) ); ?>
 		<?php
 	}
 
@@ -926,14 +1020,8 @@ class Klientoora_Card_Admin_Menu {
 		$spend_goal       = $this->sanitize_spend_challenge_goal( get_option( 'klientoora_card_spend_challenge_goal', 0 ) );
 		$spend_coupon_id  = absint( get_option( 'klientoora_card_spend_challenge_coupon_id', 0 ) );
 		$coupons          = $this->get_challenge_coupon_options();
-		$order_coupon     = $order_coupon_id && $this->is_woocommerce_active() ? new WC_Coupon( $order_coupon_id ) : null;
-		$spend_coupon     = $spend_coupon_id && $this->is_woocommerce_active() ? new WC_Coupon( $spend_coupon_id ) : null;
-		$order_coupon_label = $order_coupon && $order_coupon->get_id()
-			? $this->get_coupon_option_label( $order_coupon )
-			: __( 'משלוח חינם', 'klientoora-card' );
-		$spend_coupon_label = $spend_coupon && $spend_coupon->get_id()
-			? $this->get_coupon_option_label( $spend_coupon )
-			: __( 'משלוח חינם', 'klientoora-card' );
+		$order_coupon_label = $this->get_admin_main_challenge_coupon_label( $order_coupon_id );
+		$spend_coupon_label = $this->get_admin_main_challenge_coupon_label( $spend_coupon_id );
 		?>
 		<div class="klientoora-admin-main-club-activity__section-heading">
 			<h3><?php echo esc_html__( 'ניהול אתגרים', 'klientoora-card' ); ?></h3>
@@ -1065,11 +1153,36 @@ class Klientoora_Card_Admin_Menu {
 
 		$products = class_exists( 'Klientoora_Card_Product_Redemption' ) ? Klientoora_Card_Product_Redemption::get_admin_products() : array();
 		$stats    = $this->get_product_redemption_stats( $products );
+		$earning_percentage = $this->sanitize_points_earning_percentage( get_option( 'klientoora_card_points_earning_percentage', 10 ) );
+		$earning_decimals   = 0.0 === fmod( $earning_percentage, 1.0 ) ? 0 : 2;
 		?>
 		<div class="klientoora-admin-main-club-activity__section-heading">
 			<h3><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></h3>
 			<span><?php echo esc_html( number_format_i18n( count( $products ) ) ); ?></span>
 		</div>
+
+		<form class="klientoora-admin-main-points-earning" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+			<?php wp_nonce_field( 'klientoora_card_save_points_earning' ); ?>
+			<input type="hidden" name="action" value="klientoora_card_save_points_earning" />
+			<input type="hidden" name="klientoora_card_admin_main_redirect" value="1" />
+			<div>
+				<h4><?php echo esc_html__( 'אחוז צבירה בכל קניה', 'klientoora-card' ); ?></h4>
+				<p><?php echo esc_html__( 'מסונכרן עם Points earning percentage בהגדרות התוסף.', 'klientoora-card' ); ?></p>
+			</div>
+			<label for="klientoora_admin_main_points_earning_percentage">
+				<span><?php echo esc_html__( 'אחוז צבירה', 'klientoora-card' ); ?></span>
+				<input
+					type="number"
+					id="klientoora_admin_main_points_earning_percentage"
+					name="klientoora_card_points_earning_percentage"
+					value="<?php echo esc_attr( number_format( $earning_percentage, $earning_decimals, '.', '' ) ); ?>"
+					min="0"
+					step="0.01"
+					inputmode="decimal"
+				/>
+			</label>
+			<button type="submit"><?php echo esc_html__( 'עדכון אחוז', 'klientoora-card' ); ?></button>
+		</form>
 
 		<div class="klientoora-admin-main-product-redemptions__stats" aria-label="<?php echo esc_attr__( 'Point redemption summary', 'klientoora-card' ); ?>">
 			<?php
@@ -1282,13 +1395,8 @@ class Klientoora_Card_Admin_Menu {
 			return;
 		}
 
-		$type = in_array( $notice, array( 'created', 'updated', 'deleted', 'member_discount_saved' ), true ) ? 'success' : 'error';
-		?>
-		<div class="klientoora-admin-main__toast is-<?php echo esc_attr( $type ); ?>" role="status" aria-live="polite" data-klientoora-admin-toast>
-			<span><?php echo esc_html( $messages[ $notice ] ); ?></span>
-			<button type="button" data-klientoora-admin-toast-close aria-label="<?php echo esc_attr__( 'Close notification', 'klientoora-card' ); ?>">&times;</button>
-		</div>
-		<?php
+		$type = in_array( $notice, array( 'created', 'updated', 'deleted' ), true ) ? 'success' : 'error';
+		$this->render_admin_main_toast( $messages[ $notice ], $type );
 	}
 
 	/**
@@ -1310,9 +1418,23 @@ class Klientoora_Card_Admin_Menu {
 		if ( ! isset( $messages[ $notice ] ) ) {
 			return;
 		}
+
+		$this->render_admin_main_toast( $messages[ $notice ], 'success' );
+	}
+
+	/**
+	 * Renders a toast notification in admin-main.
+	 *
+	 * @param string $message Toast message.
+	 * @param string $type    Toast type.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_toast( $message, $type = 'success' ) {
+		$type = in_array( $type, array( 'success', 'error' ), true ) ? $type : 'success';
 		?>
-		<div class="klientoora-admin-main__toast is-success" role="status" aria-live="polite" data-klientoora-admin-toast>
-			<span><?php echo esc_html( $messages[ $notice ] ); ?></span>
+		<div class="klientoora-admin-main__toast is-<?php echo esc_attr( $type ); ?>" role="status" aria-live="polite" data-klientoora-admin-toast>
+			<span><?php echo esc_html( $message ); ?></span>
 			<button type="button" data-klientoora-admin-toast-close aria-label="<?php echo esc_attr__( 'Close notification', 'klientoora-card' ); ?>">&times;</button>
 		</div>
 		<?php
@@ -1660,12 +1782,7 @@ class Klientoora_Card_Admin_Menu {
 		}
 
 		$type = 'woocommerce_inactive' === $notice || 'not_found' === $notice ? 'error' : 'success';
-		?>
-		<div class="klientoora-admin-main__toast is-<?php echo esc_attr( $type ); ?>" role="status" aria-live="polite" data-klientoora-admin-toast>
-			<span><?php echo esc_html( $messages[ $notice ] ); ?></span>
-			<button type="button" data-klientoora-admin-toast-close aria-label="<?php echo esc_attr__( 'Close notification', 'klientoora-card' ); ?>">&times;</button>
-		</div>
-		<?php
+		$this->render_admin_main_toast( $messages[ $notice ], $type );
 	}
 
 	/**
@@ -2007,7 +2124,8 @@ class Klientoora_Card_Admin_Menu {
 	 * @return void
 	 */
 	private function render_admin_main_member_table_row( $member ) {
-		$row = $this->get_member_table_row_data( $member );
+		$row       = $this->get_member_table_row_data( $member );
+		$dialog_id = 'klientoora-admin-main-member-dialog-' . absint( $row['user_id'] );
 		?>
 		<tr>
 			<td><?php echo esc_html( (string) $row['user_id'] ); ?></td>
@@ -2019,14 +2137,261 @@ class Klientoora_Card_Admin_Menu {
 			<td><?php echo esc_html( $row['total_spent'] ); ?></td>
 			<td><?php echo esc_html( $row['registered'] ); ?></td>
 			<td>
-				<?php if ( $row['edit_url'] && current_user_can( 'edit_user', $row['user_id'] ) ) : ?>
-					<a class="klientoora-admin-main-members__action" href="<?php echo esc_url( $row['edit_url'] ); ?>"><?php echo esc_html__( 'Edit user', 'klientoora-card' ); ?></a>
+				<?php if ( current_user_can( 'edit_user', $row['user_id'] ) ) : ?>
+					<button
+						type="button"
+						class="klientoora-admin-main-members__action"
+						data-klientoora-member-dialog-trigger="<?php echo esc_attr( $dialog_id ); ?>"
+						aria-controls="<?php echo esc_attr( $dialog_id ); ?>"
+					>
+						<?php echo esc_html__( 'צפיה בפרופיל/עריכה', 'klientoora-card' ); ?>
+					</button>
 				<?php else : ?>
 					<span><?php echo esc_html__( 'No actions available', 'klientoora-card' ); ?></span>
 				<?php endif; ?>
 			</td>
 		</tr>
+		<?php $this->render_admin_main_member_dialog( $member, $row, $dialog_id ); ?>
 		<?php
+	}
+
+	/**
+	 * Renders a clean admin-main member profile dialog.
+	 *
+	 * @param WP_User              $member    Member user object.
+	 * @param array<string, mixed> $row       Display row data.
+	 * @param string               $dialog_id Dialog element ID.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_member_dialog( $member, $row, $dialog_id ) {
+		$user_id         = absint( $row['user_id'] );
+		$heading_id      = $dialog_id . '-heading';
+		$membership      = Klientoora_Card_Membership_Status::get_status( $user_id );
+		$full_name       = get_user_meta( $user_id, 'klientoora_card_full_name', true );
+		$phone           = get_user_meta( $user_id, 'klientoora_card_phone', true );
+		$birth_date      = get_user_meta( $user_id, 'klientoora_card_birth_date', true );
+		$registered_at   = get_user_meta( $user_id, 'klientoora_card_member_registered_at', true );
+		$pass_url        = get_user_meta( $user_id, 'klientoora_card_pass_url', true );
+		$personal_coupons = $this->get_admin_main_member_personal_coupons( $user_id );
+		$edit_url        = $row['edit_url'];
+		?>
+		<dialog class="klientoora-admin-main-order-dialog klientoora-admin-main-member-dialog" id="<?php echo esc_attr( $dialog_id ); ?>" aria-labelledby="<?php echo esc_attr( $heading_id ); ?>">
+			<div class="klientoora-admin-main-order-dialog__surface">
+				<header class="klientoora-admin-main-order-dialog__header">
+					<div>
+						<p><?php echo esc_html__( 'פרופיל חבר מועדון', 'klientoora-card' ); ?></p>
+						<h3 id="<?php echo esc_attr( $heading_id ); ?>"><?php echo esc_html( $row['display_name'] ); ?></h3>
+					</div>
+					<button class="klientoora-admin-main-order-dialog__close" type="button" data-klientoora-member-dialog-close aria-label="<?php echo esc_attr__( 'Close', 'klientoora-card' ); ?>">&times;</button>
+				</header>
+
+				<div class="klientoora-admin-main-order-dialog__body">
+					<details class="klientoora-admin-main-order-dialog__section" open>
+						<summary><?php echo esc_html__( 'פרטי לקוח', 'klientoora-card' ); ?></summary>
+						<?php
+						$this->render_admin_main_member_dialog_fields(
+							array(
+								__( 'User ID', 'klientoora-card' ) => (string) $user_id,
+								__( 'שם תצוגה', 'klientoora-card' ) => $row['display_name'],
+								__( 'שם מלא מהמועדון', 'klientoora-card' ) => $full_name,
+								__( 'Email', 'klientoora-card' ) => $row['user_email'],
+								__( 'מס׳ נייד', 'klientoora-card' ) => $phone,
+								__( 'תאריך לידה', 'klientoora-card' ) => $birth_date,
+								__( 'Registered', 'klientoora-card' ) => $row['registered'],
+								__( 'תאריך הצטרפות מועדון', 'klientoora-card' ) => $registered_at,
+							)
+						);
+						?>
+					</details>
+
+					<details class="klientoora-admin-main-order-dialog__section" open>
+						<summary><?php echo esc_html__( 'שכבת Klientoora', 'klientoora-card' ); ?></summary>
+						<?php
+						$this->render_admin_main_member_dialog_fields(
+							array(
+								__( 'סטטוס מועדון', 'klientoora-card' ) => $this->get_admin_main_member_status_label( $membership ),
+								__( 'יתרת נקודות', 'klientoora-card' ) => number_format_i18n( $row['points'] ),
+								__( 'נקודות שמומשו', 'klientoora-card' ) => number_format_i18n( $row['redeemed_total'] ),
+								__( 'Passkit Member ID', 'klientoora-card' ) => get_user_meta( $user_id, 'klientoora_card_passkit_member_id', true ),
+								__( 'Pass URL', 'klientoora-card' ) => $pass_url,
+								__( 'מקור הצטרפות', 'klientoora-card' ) => get_user_meta( $user_id, 'klientoora_card_member_source', true ),
+								__( 'סטטוס Make', 'klientoora-card' ) => get_user_meta( $user_id, 'klientoora_card_make_webhook_status', true ),
+								__( 'סטטוס סנכרון נקודות אחרון', 'klientoora-card' ) => get_user_meta( $user_id, 'klientoora_card_last_point_sync_status', true ),
+								__( 'סנכרון נקודות אחרון', 'klientoora-card' ) => get_user_meta( $user_id, 'klientoora_card_last_point_sync', true ),
+							)
+						);
+						?>
+					</details>
+
+					<details class="klientoora-admin-main-order-dialog__section">
+						<summary><?php echo esc_html__( 'פעילות WooCommerce', 'klientoora-card' ); ?></summary>
+						<?php
+						$this->render_admin_main_member_dialog_fields(
+							array(
+								__( 'Orders count', 'klientoora-card' ) => number_format_i18n( $row['orders_count'] ),
+								__( 'Total order amount', 'klientoora-card' ) => $row['total_spent'],
+								__( 'בסיס אתגר הזמנות', 'klientoora-card' ) => number_format_i18n( absint( get_user_meta( $user_id, 'klientoora_card_orders_challenge_baseline', true ) ) ),
+								__( 'בסיס אתגר סכום הזמנות', 'klientoora-card' ) => $this->format_member_order_amount( (float) get_user_meta( $user_id, 'klientoora_card_spend_challenge_baseline', true ) ),
+							)
+						);
+						?>
+					</details>
+
+					<details class="klientoora-admin-main-order-dialog__section">
+						<summary><?php echo esc_html__( 'הטבות אישיות', 'klientoora-card' ); ?></summary>
+						<?php if ( empty( $personal_coupons ) ) : ?>
+							<p class="klientoora-admin-main-member-dialog__empty"><?php echo esc_html__( 'אין כרגע הטבות אישיות פעילות ללקוח.', 'klientoora-card' ); ?></p>
+						<?php else : ?>
+							<div class="klientoora-admin-main-member-dialog__benefits">
+								<?php foreach ( $personal_coupons as $coupon ) : ?>
+									<div class="klientoora-admin-main-member-dialog__benefit">
+										<strong><?php echo esc_html( $this->get_admin_main_coupon_summary_label( $coupon ) ); ?></strong>
+										<span><?php echo esc_html( $coupon->get_description() ? wp_strip_all_tags( $coupon->get_description() ) : $coupon->get_code() ); ?></span>
+									</div>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+					</details>
+				</div>
+
+				<footer class="klientoora-admin-main-order-dialog__footer">
+					<button class="klientoora-admin-main-order-dialog__complete" type="button" data-klientoora-member-dialog-close><?php echo esc_html__( 'סגירה', 'klientoora-card' ); ?></button>
+					<?php if ( $edit_url && current_user_can( 'edit_user', $user_id ) ) : ?>
+						<a class="klientoora-admin-main-members__edit-link" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'עריכה מלאה ב-WordPress', 'klientoora-card' ); ?></a>
+					<?php endif; ?>
+				</footer>
+			</div>
+		</dialog>
+		<?php
+	}
+
+	/**
+	 * Renders key-value fields for the admin-main member dialog.
+	 *
+	 * @param array<string, mixed> $fields Field labels and values.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_member_dialog_fields( $fields ) {
+		?>
+		<dl class="klientoora-admin-main-order-dialog__fields">
+			<?php foreach ( $fields as $label => $value ) : ?>
+				<div>
+					<dt><?php echo esc_html( $label ); ?></dt>
+					<dd>
+						<?php
+						$value = is_scalar( $value ) ? trim( (string) $value ) : '';
+						echo esc_html( '' !== $value ? $value : '-' );
+						?>
+					</dd>
+				</div>
+			<?php endforeach; ?>
+		</dl>
+		<?php
+	}
+
+	/**
+	 * Returns a readable member status label.
+	 *
+	 * @param string $status Membership status.
+	 *
+	 * @return string
+	 */
+	private function get_admin_main_member_status_label( $status ) {
+		if ( 'active' === $status ) {
+			return __( 'פעיל', 'klientoora-card' );
+		}
+
+		return __( 'לא פעיל', 'klientoora-card' );
+	}
+
+	/**
+	 * Returns active personal benefit coupons for a member.
+	 *
+	 * @param int $user_id User ID.
+	 *
+	 * @return array<int, WC_Coupon>
+	 */
+	private function get_admin_main_member_personal_coupons( $user_id ) {
+		if ( ! class_exists( 'WC_Coupon' ) || 0 >= absint( $user_id ) ) {
+			return array();
+		}
+
+		$coupon_ids = get_posts(
+			array(
+				'fields'         => 'ids',
+				'meta_query'     => array(
+					'relation' => 'AND',
+					array(
+						'key'   => '_klientoora_challenge_coupon',
+						'value' => 'yes',
+					),
+					array(
+						'key'   => '_klientoora_challenge_user_id',
+						'value' => (string) absint( $user_id ),
+					),
+				),
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'post_status'    => 'publish',
+				'post_type'      => 'shop_coupon',
+				'posts_per_page' => -1,
+			)
+		);
+		$coupons    = array();
+
+		foreach ( $coupon_ids as $coupon_id ) {
+			$coupon = new WC_Coupon( $coupon_id );
+
+			if ( ! $coupon->get_id() || 'publish' !== $coupon->get_status() ) {
+				continue;
+			}
+
+			if ( $coupon->get_date_expires() && $coupon->get_date_expires()->getTimestamp() < current_time( 'timestamp' ) ) {
+				continue;
+			}
+
+			$usage_limit = absint( $coupon->get_usage_limit() );
+
+			if ( 0 < $usage_limit && absint( $coupon->get_usage_count() ) >= $usage_limit ) {
+				continue;
+			}
+
+			$coupons[] = $coupon;
+		}
+
+		return $coupons;
+	}
+
+	/**
+	 * Returns a human-readable coupon benefit label.
+	 *
+	 * @param WC_Coupon $coupon Coupon object.
+	 *
+	 * @return string
+	 */
+	private function get_admin_main_coupon_summary_label( $coupon ) {
+		$amount        = $coupon->get_amount();
+		$discount_type = $coupon->get_discount_type();
+
+		if ( 'percent' === $discount_type ) {
+			return sprintf(
+				/* translators: %s is a coupon percentage amount. */
+				__( '%s%% הנחה', 'klientoora-card' ),
+				number_format_i18n( (float) $amount, 0.0 === fmod( (float) $amount, 1.0 ) ? 0 : 2 )
+			);
+		}
+
+		if ( $coupon->get_free_shipping() && 0 >= (float) $amount ) {
+			return __( 'משלוח חינם', 'klientoora-card' );
+		}
+
+		return sprintf(
+			/* translators: %s is a fixed coupon amount. */
+			__( '%s הנחה', 'klientoora-card' ),
+			function_exists( 'wc_price' ) ? wp_strip_all_tags( wc_price( $amount ) ) : number_format_i18n( (float) $amount )
+		);
 	}
 
 	/**
@@ -3229,6 +3594,13 @@ class Klientoora_Card_Admin_Menu {
 			? wp_unslash( $_POST['redemption_points'] )
 			: array();
 
+		if ( isset( $_POST['klientoora_card_points_earning_percentage'] ) ) {
+			update_option(
+				'klientoora_card_points_earning_percentage',
+				$this->sanitize_points_earning_percentage( wp_unslash( $_POST['klientoora_card_points_earning_percentage'] ) )
+			);
+		}
+
 		foreach ( $product_ids as $product_id ) {
 			$product = wc_get_product( $product_id );
 
@@ -3323,6 +3695,7 @@ class Klientoora_Card_Admin_Menu {
 	private function get_product_redemption_notice_messages() {
 		return array(
 			'saved'                => __( 'מימוש הנקודות נשמר.', 'klientoora-card' ),
+			'earning_saved'        => __( 'אחוז הצבירה נשמר.', 'klientoora-card' ),
 			'woocommerce_inactive' => __( 'WooCommerce is not active.', 'klientoora-card' ),
 		);
 	}
@@ -3340,11 +3713,10 @@ class Klientoora_Card_Admin_Menu {
 				add_query_arg(
 					array(
 						'klientoora_card_product_redemption_notice' => $notice,
-						'klientoora_admin_main_tab'                  => 'club-activity',
-						'klientoora_club_activity_tab'               => 'point-redemptions',
+						'klientoora_admin_main_tab'                  => 'point-redemptions',
 					),
 					home_url( '/admin-main/' )
-				) . '#club-activity'
+				) . '#point-redemptions'
 			);
 			exit;
 		}
@@ -3473,23 +3845,23 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
-	 * Handles updating the synced fixed member discount percentage.
+	 * Handles updating the synced points earning percentage from admin-main.
 	 *
 	 * @return void
 	 */
-	public function handle_save_member_discount() {
+	public function handle_save_points_earning() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You are not allowed to do this.', 'klientoora-card' ) );
 		}
 
-		check_admin_referer( 'klientoora_card_save_member_discount' );
+		check_admin_referer( 'klientoora_card_save_points_earning' );
 
-		$percentage = isset( $_POST['loyalty_member_discount_percentage'] )
-			? $this->sanitize_percentage( wp_unslash( $_POST['loyalty_member_discount_percentage'] ) )
-			: 0;
+		$percentage = isset( $_POST['klientoora_card_points_earning_percentage'] )
+			? $this->sanitize_points_earning_percentage( wp_unslash( $_POST['klientoora_card_points_earning_percentage'] ) )
+			: 10;
 
-		update_option( 'loyalty_member_discount_percentage', $percentage );
-		$this->redirect_coupons_page( 'member_discount_saved' );
+		update_option( 'klientoora_card_points_earning_percentage', $percentage );
+		$this->redirect_product_redemptions_page( 'earning_saved' );
 	}
 
 	/**
@@ -3617,7 +3989,7 @@ class Klientoora_Card_Admin_Menu {
 			return;
 		}
 
-		$type = in_array( $notice, array( 'created', 'updated', 'deleted', 'member_discount_saved' ), true ) ? 'success' : 'error';
+		$type = in_array( $notice, array( 'created', 'updated', 'deleted' ), true ) ? 'success' : 'error';
 		?>
 		<div class="notice notice-<?php echo esc_attr( $type ); ?> is-dismissible">
 			<p><?php echo esc_html( $messages[ $notice ] ); ?></p>
@@ -3635,8 +4007,7 @@ class Klientoora_Card_Admin_Menu {
 			'created'               => __( 'Coupon created.', 'klientoora-card' ),
 			'updated'               => __( 'Coupon updated.', 'klientoora-card' ),
 			'deleted'               => __( 'Coupon moved to trash.', 'klientoora-card' ),
-			'member_discount_saved' => __( 'Fixed member discount saved.', 'klientoora-card' ),
-			'missing_code'          => __( 'Coupon code is required.', 'klientoora-card' ),
+			'missing_code'          => __( 'חובה להזין קוד קופון.', 'klientoora-card' ),
 			'duplicate_code'        => __( 'A coupon with this code already exists.', 'klientoora-card' ),
 			'save_failed'           => __( 'Coupon could not be saved. Please check the form fields and try again.', 'klientoora-card' ),
 			'not_found'             => __( 'Coupon was not found.', 'klientoora-card' ),
@@ -3652,7 +4023,7 @@ class Klientoora_Card_Admin_Menu {
 	private function render_coupon_templates() {
 		?>
 		<div class="klientoora-card-dashboard__card">
-			<h2><?php echo esc_html__( 'Coupon Templates', 'klientoora-card' ); ?></h2>
+			<h2><?php echo esc_html__( 'מאגר קופונים', 'klientoora-card' ); ?></h2>
 			<div class="klientoora-card-coupon-templates" data-klientoora-coupon-templates>
 				<?php foreach ( $this->get_coupon_templates() as $template ) : ?>
 					<button
@@ -3699,7 +4070,7 @@ class Klientoora_Card_Admin_Menu {
 		?>
 		<div class="klientoora-card-dashboard__card klientoora-card-coupon-form-card">
 			<h2>
-				<?php echo esc_html( $is_edit ? __( 'Edit Coupon', 'klientoora-card' ) : __( 'Create New Coupon', 'klientoora-card' ) ); ?>
+				<?php echo esc_html( $is_edit ? __( 'עריכת קופון', 'klientoora-card' ) : __( 'יצירת קופון חדש', 'klientoora-card' ) ); ?>
 			</h2>
 
 			<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
@@ -3709,57 +4080,57 @@ class Klientoora_Card_Admin_Menu {
 
 				<div class="klientoora-card-coupon-form-grid">
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_code"><?php echo esc_html__( 'Coupon code', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_code"><?php echo esc_html__( 'קוד קופון', 'klientoora-card' ); ?></label>
 						<input type="text" id="klientoora_coupon_code" name="coupon_code" value="<?php echo esc_attr( $is_edit ? $coupon->get_code() : '' ); ?>" required />
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_discount_type"><?php echo esc_html__( 'Discount type', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_discount_type"><?php echo esc_html__( 'סוג הנחה', 'klientoora-card' ); ?></label>
 						<select id="klientoora_coupon_discount_type" name="discount_type">
 							<?php foreach ( $allowed_discount_types as $type ) : ?>
 								<option value="<?php echo esc_attr( $type ); ?>" <?php selected( $discount_type, $type ); ?>>
-									<?php echo esc_html( $type ); ?>
+									<?php echo esc_html( $this->get_coupon_discount_type_label( $type ) ); ?>
 								</option>
 							<?php endforeach; ?>
 						</select>
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_amount"><?php echo esc_html__( 'Coupon amount', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_amount"><?php echo esc_html__( 'גובה ההנחה', 'klientoora-card' ); ?></label>
 						<input type="number" id="klientoora_coupon_amount" name="amount" value="<?php echo esc_attr( $is_edit ? $coupon->get_amount() : '' ); ?>" min="0" step="0.01" />
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_expiry_date"><?php echo esc_html__( 'Expiry date', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_expiry_date"><?php echo esc_html__( 'תאריך תפוגה', 'klientoora-card' ); ?></label>
 						<input type="date" id="klientoora_coupon_expiry_date" name="expiry_date" value="<?php echo esc_attr( $expiry_date ); ?>" />
 					</div>
 					<div class="klientoora-card-coupon-field klientoora-card-coupon-field--wide">
-						<label for="klientoora_coupon_description"><?php echo esc_html__( 'Description', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_description"><?php echo esc_html__( 'תיאור', 'klientoora-card' ); ?></label>
 						<textarea id="klientoora_coupon_description" name="description" rows="2"><?php echo esc_textarea( $is_edit ? $coupon->get_description() : '' ); ?></textarea>
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_minimum_spend"><?php echo esc_html__( 'Minimum spend', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_minimum_spend"><?php echo esc_html__( 'מינימום רכישה', 'klientoora-card' ); ?></label>
 						<input type="number" id="klientoora_coupon_minimum_spend" name="minimum_spend" value="<?php echo esc_attr( $is_edit ? $coupon->get_minimum_amount() : '' ); ?>" min="0" step="0.01" />
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_maximum_spend"><?php echo esc_html__( 'Maximum spend', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_maximum_spend"><?php echo esc_html__( 'מקסימום רכישה', 'klientoora-card' ); ?></label>
 						<input type="number" id="klientoora_coupon_maximum_spend" name="maximum_spend" value="<?php echo esc_attr( $is_edit ? $coupon->get_maximum_amount() : '' ); ?>" min="0" step="0.01" />
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_usage_limit"><?php echo esc_html__( 'Usage limit', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_usage_limit"><?php echo esc_html__( 'מגבלת שימושים כללית', 'klientoora-card' ); ?></label>
 						<input type="number" id="klientoora_coupon_usage_limit" name="usage_limit" value="<?php echo esc_attr( $is_edit ? $coupon->get_usage_limit() : '' ); ?>" min="0" step="1" />
 					</div>
 					<div class="klientoora-card-coupon-field">
-						<label for="klientoora_coupon_usage_limit_per_user"><?php echo esc_html__( 'Usage limit per user', 'klientoora-card' ); ?></label>
+						<label for="klientoora_coupon_usage_limit_per_user"><?php echo esc_html__( 'מגבלת שימוש ללקוח', 'klientoora-card' ); ?></label>
 						<input type="number" id="klientoora_coupon_usage_limit_per_user" name="usage_limit_per_user" value="<?php echo esc_attr( $is_edit ? $coupon->get_usage_limit_per_user() : '' ); ?>" min="0" step="1" />
 					</div>
 				</div>
 
 				<div class="klientoora-card-coupon-toggles">
-					<label><input type="checkbox" name="free_shipping" value="yes" <?php checked( $is_edit && $coupon->get_free_shipping() ); ?> /> <?php echo esc_html__( 'Allow free shipping', 'klientoora-card' ); ?></label>
-					<label><input type="checkbox" name="members_only" value="yes" <?php checked( $is_edit && 'yes' === $coupon->get_meta( '_loyalty_members_only' ) ); ?> /> <?php echo esc_html__( 'Members only', 'klientoora-card' ); ?></label>
-					<label><input type="checkbox" name="show_in_popup" value="yes" <?php checked( $is_edit && 'yes' === $coupon->get_meta( '_loyalty_show_in_popup' ) ); ?> /> <?php echo esc_html__( 'Show in loyalty popup', 'klientoora-card' ); ?></label>
+					<label><input type="checkbox" name="free_shipping" value="yes" <?php checked( $is_edit && $coupon->get_free_shipping() ); ?> /> <?php echo esc_html__( 'משלוח חינם', 'klientoora-card' ); ?></label>
+					<label><input type="checkbox" name="members_only" value="yes" <?php checked( $is_edit && 'yes' === $coupon->get_meta( '_loyalty_members_only' ) ); ?> /> <?php echo esc_html__( 'לחברי מועדון בלבד', 'klientoora-card' ); ?></label>
+					<label><input type="checkbox" name="show_in_popup" value="yes" <?php checked( $is_edit && 'yes' === $coupon->get_meta( '_loyalty_show_in_popup' ) ); ?> /> <?php echo esc_html__( 'הצגה בפאנל המועדון', 'klientoora-card' ); ?></label>
 				</div>
 
 				<div class="klientoora-card-coupon-form-actions">
-					<?php submit_button( $is_edit ? __( 'Update coupon', 'klientoora-card' ) : __( 'Create coupon', 'klientoora-card' ), 'primary', 'submit', false ); ?>
+					<?php submit_button( $is_edit ? __( 'עדכון קופון', 'klientoora-card' ) : __( 'יצירת קופון', 'klientoora-card' ), 'primary', 'submit', false ); ?>
 
 					<?php if ( $is_edit ) : ?>
 						<a class="button button-secondary" href="<?php echo esc_url( admin_url( 'admin.php?page=loyalty-club-coupons' ) ); ?>"><?php echo esc_html__( 'Cancel edit', 'klientoora-card' ); ?></a>
@@ -3784,20 +4155,20 @@ class Klientoora_Card_Admin_Menu {
 			<table class="widefat striped">
 				<thead>
 					<tr>
-						<th><?php echo esc_html__( 'Coupon code', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Discount type', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Amount', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Free shipping', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Expiry date', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Usage limit', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Status', 'klientoora-card' ); ?></th>
-						<th><?php echo esc_html__( 'Actions', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'קוד קופון', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'סוג הנחה', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'גובה ההנחה', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'משלוח חינם', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'תאריך תפוגה', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'מגבלת שימושים', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'סטטוס', 'klientoora-card' ); ?></th>
+						<th><?php echo esc_html__( 'פעולות', 'klientoora-card' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php if ( empty( $coupons ) ) : ?>
 						<tr>
-							<td colspan="8"><?php echo esc_html__( 'No club coupons yet.', 'klientoora-card' ); ?></td>
+							<td colspan="8"><?php echo esc_html__( 'עדיין אין קופוני מועדון.', 'klientoora-card' ); ?></td>
 						</tr>
 					<?php else : ?>
 						<?php foreach ( $coupons as $coupon ) : ?>
@@ -3820,8 +4191,8 @@ class Klientoora_Card_Admin_Menu {
 	private function render_coupon_table_row( $coupon ) {
 		$expiry_date = $coupon->get_date_expires()
 			? $coupon->get_date_expires()->date_i18n( get_option( 'date_format' ) )
-			: __( 'No expiry', 'klientoora-card' );
-		$usage_limit = $coupon->get_usage_limit() ? $coupon->get_usage_limit() : __( 'Unlimited', 'klientoora-card' );
+			: __( 'ללא תפוגה', 'klientoora-card' );
+		$usage_limit = $coupon->get_usage_limit() ? $coupon->get_usage_limit() : __( 'ללא הגבלה', 'klientoora-card' );
 		$edit_url    = add_query_arg(
 			array(
 				'page'      => 'loyalty-club-coupons',
@@ -3832,19 +4203,19 @@ class Klientoora_Card_Admin_Menu {
 		?>
 		<tr>
 			<td><code><?php echo esc_html( $coupon->get_code() ); ?></code></td>
-			<td><?php echo esc_html( $coupon->get_discount_type() ); ?></td>
+			<td><?php echo esc_html( $this->get_coupon_discount_type_label( $coupon->get_discount_type() ) ); ?></td>
 			<td><?php echo esc_html( $coupon->get_amount() ); ?></td>
-			<td><?php echo esc_html( $coupon->get_free_shipping() ? __( 'Yes', 'klientoora-card' ) : __( 'No', 'klientoora-card' ) ); ?></td>
+			<td><?php echo esc_html( $coupon->get_free_shipping() ? __( 'כן', 'klientoora-card' ) : __( 'לא', 'klientoora-card' ) ); ?></td>
 			<td><?php echo esc_html( $expiry_date ); ?></td>
 			<td><?php echo esc_html( $usage_limit ); ?></td>
 			<td><?php echo esc_html( $coupon->get_status() ); ?></td>
 			<td class="klientoora-card-coupon-actions">
-				<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'Edit', 'klientoora-card' ); ?></a>
+				<a class="button button-small" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'עריכה', 'klientoora-card' ); ?></a>
 				<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
 					<?php wp_nonce_field( 'klientoora_card_delete_coupon' ); ?>
 					<input type="hidden" name="action" value="klientoora_card_delete_coupon" />
 					<input type="hidden" name="coupon_id" value="<?php echo esc_attr( $coupon->get_id() ); ?>" />
-					<?php submit_button( __( 'Delete', 'klientoora-card' ), 'delete button-small', 'submit', false ); ?>
+					<?php submit_button( __( 'מחיקה', 'klientoora-card' ), 'delete button-small', 'submit', false ); ?>
 				</form>
 			</td>
 		</tr>
@@ -3892,6 +4263,23 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
+	 * Returns a Hebrew label for a WooCommerce coupon discount type.
+	 *
+	 * @param string $type WooCommerce discount type.
+	 *
+	 * @return string
+	 */
+	private function get_coupon_discount_type_label( $type ) {
+		$labels = array(
+			'fixed_cart'    => __( 'הנחה קבועה לעגלה', 'klientoora-card' ),
+			'percent'       => __( 'הנחה באחוזים', 'klientoora-card' ),
+			'fixed_product' => __( 'הנחה קבועה למוצר', 'klientoora-card' ),
+		);
+
+		return isset( $labels[ $type ] ) ? $labels[ $type ] : $type;
+	}
+
+	/**
 	 * Returns coupon template definitions for the admin UI.
 	 *
 	 * @return array<int, array<string, string>>
@@ -3899,10 +4287,10 @@ class Klientoora_Card_Admin_Menu {
 	private function get_coupon_templates() {
 		return array(
 			array(
-				'title'                => __( '10% Members Discount', 'klientoora-card' ),
-				'summary'              => __( 'Percent discount for active club members.', 'klientoora-card' ),
+				'title'                => __( '10% הנחה לחברי מועדון', 'klientoora-card' ),
+				'summary'              => __( 'הנחה באחוזים לחברי מועדון פעילים.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUB10',
-				'description'          => __( '10% discount for active loyalty club members.', 'klientoora-card' ),
+				'description'          => __( '10% הנחה לחברי מועדון פעילים.', 'klientoora-card' ),
 				'discount_type'        => 'percent',
 				'amount'               => '10',
 				'free_shipping'        => 'no',
@@ -3915,10 +4303,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Free Shipping', 'klientoora-card' ),
-				'summary'              => __( 'Free shipping coupon shown in the loyalty popup.', 'klientoora-card' ),
+				'title'                => __( 'משלוח חינם', 'klientoora-card' ),
+				'summary'              => __( 'קופון משלוח חינם שמוצג בפאנל המועדון.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBSHIP',
-				'description'          => __( 'Free shipping benefit for loyalty club members.', 'klientoora-card' ),
+				'description'          => __( 'הטבת משלוח חינם לחברי מועדון.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '0',
 				'free_shipping'        => 'yes',
@@ -3931,10 +4319,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Fixed Cart Benefit', 'klientoora-card' ),
-				'summary'              => __( 'Fixed cart amount discount for a campaign.', 'klientoora-card' ),
+				'title'                => __( 'הנחה קבועה לעגלה', 'klientoora-card' ),
+				'summary'              => __( 'הנחה בסכום קבוע לקמפיין מועדון.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUB50',
-				'description'          => __( 'Fixed cart discount for a loyalty club campaign.', 'klientoora-card' ),
+				'description'          => __( 'הנחה קבועה לעגלה בקמפיין מועדון.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '50',
 				'free_shipping'        => 'no',
@@ -3947,10 +4335,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Birthday Gift', 'klientoora-card' ),
-				'summary'              => __( 'Birthday fixed cart benefit for club members.', 'klientoora-card' ),
+				'title'                => __( 'מתנת יום הולדת', 'klientoora-card' ),
+				'summary'              => __( 'הטבת יום הולדת בסכום קבוע לחברי מועדון.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBBDAY',
-				'description'          => __( 'Birthday benefit for active loyalty club members.', 'klientoora-card' ),
+				'description'          => __( 'הטבת יום הולדת לחברי מועדון פעילים.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '30',
 				'free_shipping'        => 'no',
@@ -3964,9 +4352,9 @@ class Klientoora_Card_Admin_Menu {
 			),
 			array(
 				'title'                => __( 'VIP 15%', 'klientoora-card' ),
-				'summary'              => __( 'Stronger percent discount for a VIP campaign.', 'klientoora-card' ),
+				'summary'              => __( 'הנחה מוגדלת באחוזים לקמפיין VIP.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBVIP15',
-				'description'          => __( '15% discount for selected loyalty club campaigns.', 'klientoora-card' ),
+				'description'          => __( '15% הנחה לקמפיינים נבחרים של המועדון.', 'klientoora-card' ),
 				'discount_type'        => 'percent',
 				'amount'               => '15',
 				'free_shipping'        => 'no',
@@ -3979,10 +4367,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Weekend Deal', 'klientoora-card' ),
-				'summary'              => __( 'Fixed weekend cart discount.', 'klientoora-card' ),
+				'title'                => __( 'מבצע סוף שבוע', 'klientoora-card' ),
+				'summary'              => __( 'הנחה קבועה לעגלה בסוף השבוע.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBWEEKEND',
-				'description'          => __( 'Weekend loyalty club cart benefit.', 'klientoora-card' ),
+				'description'          => __( 'הטבת סוף שבוע לעגלת חברי מועדון.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '25',
 				'free_shipping'        => 'no',
@@ -3995,10 +4383,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Product Treat', 'klientoora-card' ),
-				'summary'              => __( 'Fixed product discount for member campaigns.', 'klientoora-card' ),
+				'title'                => __( 'הנחת מוצר', 'klientoora-card' ),
+				'summary'              => __( 'הנחה קבועה למוצר בקמפיין מועדון.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBPRODUCT',
-				'description'          => __( 'Product discount for loyalty club members.', 'klientoora-card' ),
+				'description'          => __( 'הנחת מוצר לחברי מועדון.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_product',
 				'amount'               => '10',
 				'free_shipping'        => 'no',
@@ -4011,10 +4399,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Free Shipping Plus', 'klientoora-card' ),
-				'summary'              => __( 'Free shipping with a small cart discount.', 'klientoora-card' ),
+				'title'                => __( 'משלוח חינם פלוס', 'klientoora-card' ),
+				'summary'              => __( 'משלוח חינם יחד עם הנחה קטנה לעגלה.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBSHIPPLUS',
-				'description'          => __( 'Free shipping and a small fixed cart benefit.', 'klientoora-card' ),
+				'description'          => __( 'משלוח חינם והטבת עגלה קבועה קטנה.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '15',
 				'free_shipping'        => 'yes',
@@ -4027,10 +4415,10 @@ class Klientoora_Card_Admin_Menu {
 				'show_in_popup'        => 'yes',
 			),
 			array(
-				'title'                => __( 'Welcome Back', 'klientoora-card' ),
-				'summary'              => __( 'Cart discount for returning club members.', 'klientoora-card' ),
+				'title'                => __( 'ברוכים השבים', 'klientoora-card' ),
+				'summary'              => __( 'הנחת עגלה לחברי מועדון שחוזרים לקנות.', 'klientoora-card' ),
 				'coupon_code'          => 'CLUBBACK',
-				'description'          => __( 'Welcome back benefit for loyalty club members.', 'klientoora-card' ),
+				'description'          => __( 'הטבת חזרה לחברי מועדון.', 'klientoora-card' ),
 				'discount_type'        => 'fixed_cart',
 				'amount'               => '20',
 				'free_shipping'        => 'no',
@@ -4303,8 +4691,52 @@ class Klientoora_Card_Admin_Menu {
 			/* translators: 1: coupon code, 2: discount type, 3: coupon amount. */
 			__( '%1$s - %2$s - %3$s', 'klientoora-card' ),
 			$coupon->get_code(),
-			$coupon->get_discount_type(),
-			$coupon->get_free_shipping() ? __( 'Free shipping', 'klientoora-card' ) : $coupon->get_amount()
+			$this->get_coupon_discount_type_label( $coupon->get_discount_type() ),
+			$coupon->get_free_shipping() ? __( 'משלוח חינם', 'klientoora-card' ) : $coupon->get_amount()
+		);
+	}
+
+	/**
+	 * Returns the selected challenge reward label.
+	 *
+	 * @param int $coupon_id Coupon ID.
+	 *
+	 * @return string
+	 */
+	private function get_admin_main_challenge_coupon_label( $coupon_id ) {
+		if ( ! $coupon_id || ! $this->is_woocommerce_active() ) {
+			return __( 'משלוח חינם', 'klientoora-card' );
+		}
+
+		$coupon = new WC_Coupon( $coupon_id );
+
+		return $coupon && $coupon->get_id() ? $this->get_coupon_option_label( $coupon ) : __( 'משלוח חינם', 'klientoora-card' );
+	}
+
+	/**
+	 * Returns aggregate customer point totals.
+	 *
+	 * @return array{available:int, redeemed:int}
+	 */
+	private function get_admin_main_customer_points_totals() {
+		global $wpdb;
+
+		$available = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COALESCE(SUM(CAST(meta_value AS UNSIGNED)), 0) FROM {$wpdb->usermeta} WHERE meta_key = %s",
+				'klientoora_card_points'
+			)
+		);
+		$redeemed = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COALESCE(SUM(CAST(meta_value AS UNSIGNED)), 0) FROM {$wpdb->usermeta} WHERE meta_key = %s",
+				'loyalty_points_redeemed_total'
+			)
+		);
+
+		return array(
+			'available' => max( 0, $available ),
+			'redeemed'  => max( 0, $redeemed ),
 		);
 	}
 
@@ -4420,9 +4852,10 @@ class Klientoora_Card_Admin_Menu {
 				add_query_arg(
 					array(
 						'klientoora_card_coupon_notice' => $notice,
+						'klientoora_admin_main_tab'     => 'club-coupons',
 					),
 					home_url( '/admin-main/' )
-				) . '#club-activity'
+				) . '#club-coupons'
 			);
 			exit;
 		}
@@ -4452,9 +4885,10 @@ class Klientoora_Card_Admin_Menu {
 			add_query_arg(
 				array(
 					'klientoora_card_challenge_notice' => $notice,
+					'klientoora_admin_main_tab'        => 'challenges',
 				),
 				home_url( '/admin-main/' )
-			) . '#club-activity'
+			) . '#challenges'
 		);
 		exit;
 	}
@@ -4495,15 +4929,6 @@ class Klientoora_Card_Admin_Menu {
 	 */
 	public function render_points_section_description() {
 		echo '<p>' . esc_html__( 'Configure how many loyalty points members earn from completed WooCommerce orders.', 'klientoora-card' ) . '</p>';
-	}
-
-	/**
-	 * Renders the benefits and promotions settings section description.
-	 *
-	 * @return void
-	 */
-	public function render_benefits_section_description() {
-		echo '<p>' . esc_html__( 'Configure fixed loyalty member benefits and promotions.', 'klientoora-card' ) . '</p>';
 	}
 
 	/**
@@ -4552,30 +4977,6 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
-	 * Renders the fixed member discount percentage field.
-	 *
-	 * @return void
-	 */
-	public function render_member_discount_percentage_field() {
-		$percentage = get_option( 'loyalty_member_discount_percentage', 0 );
-		?>
-		<input
-			type="number"
-			id="loyalty_member_discount_percentage"
-			name="loyalty_member_discount_percentage"
-			class="small-text"
-			value="<?php echo esc_attr( $percentage ); ?>"
-			min="0"
-			max="100"
-			step="0.01"
-		/>
-		<p class="description">
-			<?php echo esc_html__( 'Example: 10 means active loyalty members get a 10% cart discount.', 'klientoora-card' ); ?>
-		</p>
-		<?php
-	}
-
-	/**
 	 * Sanitizes the Make webhook URL.
 	 *
 	 * @param string $url Webhook URL.
@@ -4603,19 +5004,6 @@ class Klientoora_Card_Admin_Menu {
 		$percentage = is_numeric( $percentage ) ? (float) $percentage : 10;
 
 		return max( 0, $percentage );
-	}
-
-	/**
-	 * Sanitizes a percentage setting.
-	 *
-	 * @param mixed $percentage Submitted percentage.
-	 *
-	 * @return float
-	 */
-	public function sanitize_percentage( $percentage ) {
-		$percentage = is_numeric( $percentage ) ? (float) $percentage : 0;
-
-		return min( 100, max( 0, $percentage ) );
 	}
 
 	/**

@@ -38,6 +38,14 @@ class Klientoora_Card_Coupon_Validation {
 			}
 		}
 
+		if ( 'yes' === $coupon->get_meta( '_klientoora_fixed_checkout_coupon' ) ) {
+			if ( ! is_user_logged_in() ) {
+				throw new Exception( esc_html__( 'הטבת המועדון הקבועה זמינה למשתמשים רשומים בלבד.', 'klientoora-card' ) );
+			}
+
+			return $is_valid;
+		}
+
 		if ( 'yes' !== $coupon->get_meta( '_loyalty_members_only' ) ) {
 			return $is_valid;
 		}

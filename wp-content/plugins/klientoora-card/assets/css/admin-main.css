@@ -65,12 +65,32 @@ body.klientoora-admin-main {
 	gap: 6px;
 }
 
+.klientoora-admin-main__nav-group {
+	display: grid;
+	gap: 6px;
+}
+
 .klientoora-admin-main__nav a {
 	border-radius: 8px;
 	color: #cbd5e1;
 	font-size: 15px;
 	font-weight: 700;
 	padding: 12px 14px;
+}
+
+.klientoora-admin-main__subnav {
+	border-inline-start: 1px solid #334155;
+	display: grid;
+	gap: 4px;
+	margin-inline-start: 14px;
+	padding-inline-start: 10px;
+}
+
+.klientoora-admin-main__subnav a {
+	color: #94a3b8;
+	font-size: 13px;
+	min-height: 34px;
+	padding: 7px 10px;
 }
 
 .klientoora-admin-main__nav a:hover,
@@ -821,11 +841,72 @@ body.klientoora-admin-main {
 
 .klientoora-admin-main-members__action {
 	align-items: center;
+	background: #fff;
 	border: 1px solid #99f6e4;
 	border-radius: 8px;
+	color: #0f766e;
+	cursor: pointer;
 	display: inline-flex;
+	font: inherit;
+	font-weight: 800;
 	min-height: 34px;
 	padding: 6px 10px;
+}
+
+.klientoora-admin-main-members__action:hover,
+.klientoora-admin-main-members__action:focus {
+	background: #f0fdfa;
+}
+
+.klientoora-admin-main-member-dialog__empty {
+	color: #64748b;
+	font-size: 14px;
+	font-weight: 700;
+	margin: 12px 0 0;
+}
+
+.klientoora-admin-main-member-dialog__benefits {
+	display: grid;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.klientoora-admin-main-member-dialog__benefit {
+	background: #fff;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 5px;
+	padding: 12px;
+}
+
+.klientoora-admin-main-member-dialog__benefit strong {
+	color: #172033;
+	font-size: 15px;
+}
+
+.klientoora-admin-main-member-dialog__benefit span {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.klientoora-admin-main-members__edit-link {
+	align-items: center;
+	background: #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	display: inline-flex;
+	font-weight: 800;
+	min-height: 38px;
+	padding: 8px 13px;
+	text-decoration: none;
+}
+
+.klientoora-admin-main-members__edit-link:hover,
+.klientoora-admin-main-members__edit-link:focus {
+	background: #115e59;
+	color: #fff;
 }
 
 .klientoora-admin-main-products {
@@ -988,6 +1069,74 @@ body.klientoora-admin-main {
 	gap: 22px;
 }
 
+.klientoora-admin-main-club-summary {
+	background: #fff;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 16px;
+	padding: 18px;
+}
+
+.klientoora-admin-main-club-summary__button {
+	align-items: center;
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	display: inline-flex;
+	font-size: 14px;
+	font-weight: 800;
+	justify-content: center;
+	justify-self: start;
+	min-height: 40px;
+	padding: 8px 14px;
+	text-decoration: none;
+}
+
+.klientoora-admin-main-club-summary__button:hover,
+.klientoora-admin-main-club-summary__button:focus {
+	background: #115e59;
+	border-color: #115e59;
+	color: #fff;
+}
+
+.klientoora-admin-main-club-summary__items {
+	display: grid;
+	gap: 14px;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.klientoora-admin-main-club-summary__item {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 8px;
+	min-width: 0;
+	padding: 16px;
+}
+
+.klientoora-admin-main-club-summary__item span {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-club-summary__item strong {
+	color: #0f172a;
+	font-size: 22px;
+	line-height: 1.2;
+}
+
+.klientoora-admin-main-club-summary__item p {
+	color: #334155;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.45;
+	margin: 0;
+}
+
 .klientoora-admin-main-club-activity__header {
 	align-items: end;
 	display: flex;
@@ -1000,35 +1149,6 @@ body.klientoora-admin-main {
 	font-size: 14px;
 	font-weight: 700;
 	margin: 6px 0 0;
-}
-
-.klientoora-admin-main-club-activity__tabs {
-	align-items: center;
-	border-bottom: 1px solid #d9e1ea;
-	display: flex;
-	gap: 8px;
-	overflow-x: auto;
-	padding-bottom: 10px;
-}
-
-.klientoora-admin-main-club-activity__tabs button {
-	background: #f8fafc;
-	border: 1px solid #d9e1ea;
-	border-radius: 8px;
-	color: #475569;
-	cursor: pointer;
-	font: inherit;
-	font-size: 14px;
-	font-weight: 800;
-	min-height: 40px;
-	padding: 8px 14px;
-	white-space: nowrap;
-}
-
-.klientoora-admin-main-club-activity__tabs button.is-active {
-	background: #0f766e;
-	border-color: #0f766e;
-	color: #fff;
 }
 
 .klientoora-admin-main-club-activity__panel {
@@ -1111,84 +1231,6 @@ body.klientoora-admin-main {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.klientoora-admin-main-member-discount {
-	align-items: end;
-	background: #f8fafc;
-	border: 1px solid #d9e1ea;
-	border-radius: 8px;
-	display: grid;
-	gap: 18px;
-	grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-	margin-bottom: 18px;
-	padding: 18px;
-}
-
-.klientoora-admin-main-member-discount h3 {
-	color: #0f172a;
-	font-size: 18px;
-	line-height: 1.25;
-	margin: 0;
-}
-
-.klientoora-admin-main-member-discount p {
-	color: #64748b;
-	font-size: 14px;
-	font-weight: 700;
-	line-height: 1.5;
-	margin: 8px 0 0;
-	max-width: 720px;
-}
-
-.klientoora-admin-main-member-discount form {
-	display: grid;
-	gap: 8px;
-}
-
-.klientoora-admin-main-member-discount label {
-	color: #64748b;
-	font-size: 12px;
-	font-weight: 800;
-}
-
-.klientoora-admin-main-member-discount__control {
-	align-items: center;
-	background: #fff;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	min-height: 42px;
-	overflow: hidden;
-}
-
-.klientoora-admin-main-member-discount__control input {
-	background: transparent;
-	border: 0;
-	color: #172033;
-	font: inherit;
-	min-height: 42px;
-	padding: 8px 10px;
-	width: 100%;
-}
-
-.klientoora-admin-main-member-discount__control span {
-	color: #64748b;
-	font-weight: 800;
-	padding: 0 12px;
-}
-
-.klientoora-admin-main-member-discount button {
-	background: #0f766e;
-	border: 1px solid #0f766e;
-	border-radius: 8px;
-	color: #fff;
-	cursor: pointer;
-	font: inherit;
-	font-weight: 800;
-	min-height: 42px;
-	padding: 8px 14px;
-}
-
 .klientoora-admin-main-coupon-card {
 	min-width: 0;
 }
@@ -1198,7 +1240,6 @@ body.klientoora-admin-main {
 	border: 1px solid #d9e1ea;
 	border-radius: 8px;
 	color: #172033;
-	cursor: pointer;
 	display: grid;
 	font: inherit;
 	gap: 12px;
@@ -1206,6 +1247,10 @@ body.klientoora-admin-main {
 	padding: 16px;
 	text-align: right;
 	width: 100%;
+}
+
+.klientoora-admin-main-coupon-card button {
+	cursor: pointer;
 }
 
 .klientoora-admin-main-coupon-card button:hover,
@@ -1563,82 +1608,11 @@ body.klientoora-admin-main {
 }
 
 .klientoora-admin-main-coupons-manual {
-	border: 1px solid #d9e1ea;
-	border-radius: 8px;
-	padding: 16px;
+	display: flex;
+	justify-content: flex-start;
 }
 
-.klientoora-admin-main-coupons-manual[open] {
-	display: grid;
-	gap: 16px;
-}
-
-.klientoora-admin-main-coupons-manual summary {
-	color: #0f172a;
-	cursor: pointer;
-	font-size: 16px;
-	font-weight: 800;
-	list-style: none;
-}
-
-.klientoora-admin-main-coupons-manual summary::-webkit-details-marker {
-	display: none;
-}
-
-.klientoora-admin-main-coupon-manual-form {
-	display: grid;
-	gap: 14px;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.klientoora-admin-main-coupon-manual-form div {
-	display: grid;
-	gap: 6px;
-}
-
-.klientoora-admin-main-coupon-manual-form .is-wide {
-	grid-column: 1 / -1;
-}
-
-.klientoora-admin-main-coupon-manual-form label {
-	color: #64748b;
-	font-size: 12px;
-	font-weight: 800;
-}
-
-.klientoora-admin-main-coupon-manual-form input,
-.klientoora-admin-main-coupon-manual-form select,
-.klientoora-admin-main-coupon-manual-form textarea {
-	background: #fff;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	color: #172033;
-	font: inherit;
-	min-height: 40px;
-	padding: 8px 10px;
-	width: 100%;
-}
-
-.klientoora-admin-main-coupon-manual-form__checks {
-	align-items: center;
-	display: flex !important;
-	flex-wrap: wrap;
-	gap: 12px;
-}
-
-.klientoora-admin-main-coupon-manual-form__checks label {
-	align-items: center;
-	color: #172033;
-	display: inline-flex;
-	gap: 7px;
-}
-
-.klientoora-admin-main-coupon-manual-form__checks input {
-	min-height: 0;
-	width: auto;
-}
-
-.klientoora-admin-main-coupon-manual-form button {
+.klientoora-admin-main-coupons-manual button {
 	background: #0f766e;
 	border: 1px solid #0f766e;
 	border-radius: 8px;
@@ -1840,6 +1814,65 @@ body.klientoora-admin-main {
 	gap: 14px;
 }
 
+.klientoora-admin-main-points-earning {
+	align-items: end;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 14px;
+	grid-template-columns: minmax(0, 1fr) minmax(180px, 260px) auto;
+	padding: 16px;
+}
+
+.klientoora-admin-main-points-earning h4 {
+	color: #0f172a;
+	font-size: 18px;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.klientoora-admin-main-points-earning p {
+	color: #64748b;
+	font-size: 13px;
+	font-weight: 700;
+	margin: 6px 0 0;
+}
+
+.klientoora-admin-main-points-earning label {
+	display: grid;
+	gap: 6px;
+}
+
+.klientoora-admin-main-points-earning span {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-points-earning input {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #172033;
+	font: inherit;
+	min-height: 40px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.klientoora-admin-main-points-earning button {
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 14px;
+	white-space: nowrap;
+}
+
 .klientoora-admin-main-product-redemptions__toggle {
 	align-items: center;
 	display: inline-flex;
@@ -1917,6 +1950,19 @@ body.klientoora-admin-main {
 		padding-bottom: 4px;
 	}
 
+	.klientoora-admin-main__nav-group {
+		display: flex;
+		gap: 6px;
+	}
+
+	.klientoora-admin-main__subnav {
+		border-inline-start: 0;
+		display: flex;
+		gap: 6px;
+		margin-inline-start: 0;
+		padding-inline-start: 0;
+	}
+
 	.klientoora-admin-main__nav a {
 		white-space: nowrap;
 	}
@@ -1961,11 +2007,11 @@ body.klientoora-admin-main {
 		grid-template-columns: 1fr;
 	}
 
-	.klientoora-admin-main-challenge-editor__grid {
+	.klientoora-admin-main-points-earning {
 		grid-template-columns: 1fr;
 	}
 
-	.klientoora-admin-main-member-discount {
+	.klientoora-admin-main-challenge-editor__grid {
 		grid-template-columns: 1fr;
 	}
 
@@ -1973,9 +2019,12 @@ body.klientoora-admin-main {
 		grid-template-columns: 1fr;
 	}
 
+	.klientoora-admin-main-club-summary__items {
+		grid-template-columns: 1fr;
+	}
+
 	.klientoora-admin-main-coupon-dialog__grid,
-	.klientoora-admin-main-product-dialog__grid,
-	.klientoora-admin-main-coupon-manual-form {
+	.klientoora-admin-main-product-dialog__grid {
 		grid-template-columns: 1fr;
 	}
 

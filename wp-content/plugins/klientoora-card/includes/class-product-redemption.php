@@ -235,19 +235,19 @@ class Klientoora_Card_Product_Redemption {
 
 		$points_price         = self::get_product_points_price( $product );
 		$balance              = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
-		$cart_redemption_cost = $this->get_cart_redemption_points_total( $user_id );
+		$available_balance    = self::get_user_available_points_balance( $user_id );
 
-		if ( $this->cart_has_redeemed_product( $product_id ) ) {
+		if ( self::cart_has_redeemed_product( $product_id ) ) {
 			wp_send_json_success(
 				array(
 					'message'        => __( 'המוצר כבר נמצא בעגלה.', 'klientoora-card' ),
 					'cart_url'       => wc_get_cart_url(),
-					'points_balance' => $balance,
+					'points_balance' => $available_balance,
 				)
 			);
 		}
 
-		if ( $balance < $cart_redemption_cost + $points_price ) {
+		if ( $available_balance < $points_price ) {
 			wp_send_json_error(
 				array( 'message' => __( 'אין לך מספיק נקודות למימוש המוצר.', 'klientoora-card' ) ),
 				400
@@ -278,12 +278,13 @@ class Klientoora_Card_Product_Redemption {
 		$this->save_cart_ledger_item( $cart_item_key, $user_id, $product_id, $points_price, false, false );
 
 		WC()->cart->calculate_totals();
+		$available_balance = self::get_user_available_points_balance( $user_id );
 
 		wp_send_json_success(
 			array(
 				'message'        => __( 'המוצר נוסף לעגלה למימוש בנקודות. הנקודות ינוכו בשליחת ההזמנה.', 'klientoora-card' ),
 				'cart_url'       => wc_get_cart_url(),
-				'points_balance' => $balance,
+				'points_balance' => $available_balance,
 			)
 		);
 	}
@@ -414,9 +415,10 @@ class Klientoora_Card_Product_Redemption {
 			return;
 		}
 
-		$balance = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+		$balance         = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+		$reserved_points = self::get_cart_redemption_points_total( $user_id );
 
-		if ( $balance < $points ) {
+		if ( $balance < $reserved_points ) {
 			unset( $cart->cart_contents[ $cart_item_key ] );
 
 			if ( function_exists( 'wc_add_notice' ) ) {
@@ -426,14 +428,13 @@ class Klientoora_Card_Product_Redemption {
 			return;
 		}
 
-		Klientoora_Card_Points::remove_points( $user_id, $points, 'product_redemption_cart_restored' );
 		$this->save_cart_ledger_item(
 			$cart_item_key,
 			$user_id,
 			isset( $cart_item['product_id'] ) ? absint( $cart_item['product_id'] ) : 0,
 			$points,
 			false,
-			true
+			false
 		);
 
 		if ( isset( $cart->removed_cart_contents[ $cart_item_key ][ self::CART_RESTORED_KEY ] ) ) {
@@ -612,7 +613,7 @@ class Klientoora_Card_Product_Redemption {
 			);
 		}
 
-		$points = absint( get_user_meta( get_current_user_id(), 'klientoora_card_points', true ) );
+		$points = self::get_user_available_points_balance( get_current_user_id() );
 
 		wp_send_json_success(
 			array(
@@ -620,6 +621,26 @@ class Klientoora_Card_Product_Redemption {
 				'points_balance_formatted' => number_format_i18n( $points ),
 			)
 		);
+	}
+
+	/**
+	 * Returns the user's available points after reserving cart redemption items.
+	 *
+	 * @param int $user_id User ID.
+	 *
+	 * @return int
+	 */
+	public static function get_user_available_points_balance( $user_id ) {
+		$user_id = absint( $user_id );
+
+		if ( 0 === $user_id ) {
+			return 0;
+		}
+
+		$balance  = absint( get_user_meta( $user_id, 'klientoora_card_points', true ) );
+		$reserved = self::get_cart_redemption_points_total( $user_id );
+
+		return max( 0, $balance - $reserved );
 	}
 
 	/**
@@ -688,8 +709,16 @@ class Klientoora_Card_Product_Redemption {
 	 *
 	 * @return bool
 	 */
-	private function cart_has_redeemed_product( $product_id ) {
-		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+	public static function cart_has_redeemed_product( $product_id ) {
+		if ( ! function_exists( 'WC' ) ) {
+			return false;
+		}
+
+		if ( ! WC()->cart && function_exists( 'wc_load_cart' ) ) {
+			wc_load_cart();
+		}
+
+		if ( ! WC()->cart ) {
 			return false;
 		}
 
@@ -713,8 +742,16 @@ class Klientoora_Card_Product_Redemption {
 	 *
 	 * @return int
 	 */
-	private function get_cart_redemption_points_total( $user_id ) {
-		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+	public static function get_cart_redemption_points_total( $user_id ) {
+		if ( ! function_exists( 'WC' ) ) {
+			return 0;
+		}
+
+		if ( ! WC()->cart && function_exists( 'wc_load_cart' ) ) {
+			wc_load_cart();
+		}
+
+		if ( ! WC()->cart ) {
 			return 0;
 		}
 
