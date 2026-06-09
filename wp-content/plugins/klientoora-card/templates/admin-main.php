@@ -30,7 +30,7 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 			<nav class="klientoora-admin-main__nav">
 				<a class="is-active" href="#dashboard" data-klientoora-main-nav><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></a>
 				<a href="#orders" data-klientoora-main-nav><?php echo esc_html__( 'הזמנות', 'klientoora-card' ); ?></a>
-				<a href="#products" data-klientoora-main-nav><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></a>
+				<a href="#products" data-klientoora-main-nav><?php echo esc_html__( 'קטלוג מוצרים', 'klientoora-card' ); ?></a>
 				<a href="#members" data-klientoora-main-nav><?php echo esc_html__( 'חברי מועדון', 'klientoora-card' ); ?></a>
 				<div class="klientoora-admin-main__nav-group">
 					<a href="#club-activity" data-klientoora-main-nav><?php echo esc_html__( 'פעילות מועדון', 'klientoora-card' ); ?></a>

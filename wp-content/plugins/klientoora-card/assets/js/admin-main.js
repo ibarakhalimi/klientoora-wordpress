@@ -179,6 +179,93 @@
 		} );
 	}
 
+	function applyProductFilters() {
+		var categoryFilter = document.querySelector( '[data-klientoora-product-category-filter]' );
+		var visibilityFilter = document.querySelector( '[data-klientoora-product-visibility-filter]' );
+		var selectedCategory = categoryFilter ? categoryFilter.value : '';
+		var selectedVisibility = visibilityFilter ? visibilityFilter.value : '';
+
+		document.querySelectorAll( '[data-klientoora-product-row]' ).forEach( function ( row ) {
+			var rowCategories = row.dataset.categoryIds ? row.dataset.categoryIds.split( ',' ) : [];
+			var rowVisibility = row.dataset.productVisibility || '';
+			var categoryMatch = ! selectedCategory || rowCategories.indexOf( selectedCategory ) !== -1;
+			var visibilityMatch = ! selectedVisibility || rowVisibility === selectedVisibility;
+
+			row.hidden = ! ( categoryMatch && visibilityMatch );
+		} );
+	}
+
+	function setupProductFilters() {
+		document.querySelectorAll( '[data-klientoora-product-category-filter], [data-klientoora-product-visibility-filter]' ).forEach( function ( filter ) {
+			filter.addEventListener( 'change', applyProductFilters );
+		} );
+
+		applyProductFilters();
+	}
+
+	function setProductImageSelection( attachment, imageControl ) {
+		var scope = imageControl || document;
+		var imageInput = scope.querySelector( '[data-klientoora-product-image-id]' );
+		var preview = scope.querySelector( '[data-klientoora-product-image-preview]' );
+		var imageUrl = '';
+		var image = null;
+		var placeholder = null;
+
+		if ( ! imageInput || ! preview ) {
+			return;
+		}
+
+		preview.textContent = '';
+
+		if ( attachment && attachment.id ) {
+			imageInput.value = attachment.id;
+			imageUrl = attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;
+
+			if ( imageUrl ) {
+				image = document.createElement( 'img' );
+				image.src = imageUrl;
+				image.alt = '';
+				preview.appendChild( image );
+				return;
+			}
+
+			placeholder = document.createElement( 'span' );
+			placeholder.textContent = attachment.filename || 'נבחרה תמונה';
+			preview.appendChild( placeholder );
+			return;
+		}
+
+		imageInput.value = '';
+		placeholder = document.createElement( 'span' );
+		placeholder.textContent = 'לא נבחרה תמונה';
+		preview.appendChild( placeholder );
+	}
+
+	function openProductImagePicker( imageControl ) {
+		var frame = null;
+
+		if ( ! window.wp || ! window.wp.media ) {
+			return;
+		}
+
+		frame = window.wp.media( {
+			title: 'בחירת תמונת מוצר',
+			button: {
+				text: 'בחירת תמונה'
+			},
+			multiple: false,
+			library: {
+				type: 'image'
+			}
+		} );
+
+		frame.on( 'select', function () {
+			setProductImageSelection( frame.state().get( 'selection' ).first().toJSON(), imageControl );
+		} );
+
+		frame.open();
+	}
+
 	function activateInitialClubActivityTab() {
 		var params = getUrlParams();
 		var requestedTab = params.get( 'klientoora_club_activity_tab' );
@@ -215,8 +302,12 @@
 		var couponCard = event.target.closest( '[data-klientoora-coupon-dialog-trigger]' );
 		var productDialogTrigger = event.target.closest( '[data-klientoora-product-dialog-trigger]' );
 		var productDialogCloseButton = event.target.closest( '[data-klientoora-product-dialog-close]' );
+		var categoryDialogTrigger = event.target.closest( '[data-klientoora-category-dialog-trigger]' );
+		var categoryDialogCloseButton = event.target.closest( '[data-klientoora-category-dialog-close]' );
 		var memberDialogTrigger = event.target.closest( '[data-klientoora-member-dialog-trigger]' );
 		var memberDialogCloseButton = event.target.closest( '[data-klientoora-member-dialog-close]' );
+		var productImageSelect = event.target.closest( '[data-klientoora-product-image-select]' );
+		var productImageClear = event.target.closest( '[data-klientoora-product-image-clear]' );
 		var orderCard = event.target.closest( '[data-klientoora-order-dialog-trigger]' );
 
 		if ( toastCloseButton ) {
@@ -249,6 +340,11 @@
 			return;
 		}
 
+		if ( categoryDialogCloseButton ) {
+			closeOrderDialog( categoryDialogCloseButton.closest( 'dialog' ) );
+			return;
+		}
+
 		if ( memberDialogCloseButton ) {
 			closeOrderDialog( memberDialogCloseButton.closest( 'dialog' ) );
 			return;
@@ -256,6 +352,16 @@
 
 		if ( event.target.matches( '.klientoora-admin-main-product-dialog' ) ) {
 			closeOrderDialog( event.target );
+			return;
+		}
+
+		if ( productImageSelect ) {
+			openProductImagePicker( productImageSelect.closest( '.klientoora-admin-main-product-dialog__image-control' ) );
+			return;
+		}
+
+		if ( productImageClear ) {
+			setProductImageSelection( null, productImageClear.closest( '.klientoora-admin-main-product-dialog__image-control' ) );
 			return;
 		}
 
@@ -274,6 +380,11 @@
 			return;
 		}
 
+		if ( categoryDialogTrigger ) {
+			openOrderDialog( categoryDialogTrigger.dataset.klientooraCategoryDialogTrigger );
+			return;
+		}
+
 		if ( memberDialogTrigger ) {
 			openOrderDialog( memberDialogTrigger.dataset.klientooraMemberDialogTrigger );
 			return;
@@ -287,6 +398,7 @@
 	document.addEventListener( 'keydown', function ( event ) {
 		var couponCard = event.target.closest( '[data-klientoora-coupon-dialog-trigger]' );
 		var productDialogTrigger = event.target.closest( '[data-klientoora-product-dialog-trigger]' );
+		var categoryDialogTrigger = event.target.closest( '[data-klientoora-category-dialog-trigger]' );
 		var memberDialogTrigger = event.target.closest( '[data-klientoora-member-dialog-trigger]' );
 		var orderCard = event.target.closest( '[data-klientoora-order-dialog-trigger]' );
 
@@ -299,6 +411,12 @@
 		if ( productDialogTrigger && ( event.key === 'Enter' || event.key === ' ' ) ) {
 			event.preventDefault();
 			openOrderDialog( productDialogTrigger.dataset.klientooraProductDialogTrigger );
+			return;
+		}
+
+		if ( categoryDialogTrigger && ( event.key === 'Enter' || event.key === ' ' ) ) {
+			event.preventDefault();
+			openOrderDialog( categoryDialogTrigger.dataset.klientooraCategoryDialogTrigger );
 			return;
 		}
 
@@ -321,6 +439,7 @@
 	} );
 
 	setupOrderStatusFilters();
+	setupProductFilters();
 	setupToasts();
 	activateTab( getInitialMainTab() );
 	activateInitialClubActivityTab();

@@ -66,6 +66,10 @@ class Klientoora_Card_Admin_Main_Page {
 		$css_path = KLIENTOORA_CARD_PATH . 'assets/css/admin-main.css';
 		$js_path  = KLIENTOORA_CARD_PATH . 'assets/js/admin-main.js';
 
+		if ( current_user_can( 'upload_files' ) ) {
+			wp_enqueue_media();
+		}
+
 		wp_enqueue_style(
 			'klientoora-card-admin-main',
 			KLIENTOORA_CARD_URL . 'assets/css/admin-main.css',

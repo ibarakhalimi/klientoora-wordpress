@@ -941,10 +941,50 @@ body.klientoora-admin-main {
 	white-space: nowrap;
 }
 
+.klientoora-admin-main-products__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
 .klientoora-admin-main-products__stats {
 	display: grid;
 	gap: 14px;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-products__filters {
+	align-items: end;
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 14px;
+}
+
+.klientoora-admin-main-products__filters label {
+	display: grid;
+	gap: 6px;
+	min-width: 190px;
+}
+
+.klientoora-admin-main-products__filters span {
+	color: #64748b;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.klientoora-admin-main-products__filters select {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #172033;
+	font: inherit;
+	min-height: 40px;
+	padding: 8px 10px;
 }
 
 .klientoora-admin-main-products__stat {
@@ -977,7 +1017,7 @@ body.klientoora-admin-main {
 
 .klientoora-admin-main-products__table {
 	border-collapse: collapse;
-	min-width: 980px;
+	min-width: 1180px;
 	width: 100%;
 }
 
@@ -1048,13 +1088,17 @@ body.klientoora-admin-main {
 
 .klientoora-admin-main-products__action {
 	align-items: center;
+	background: #f0fdfa;
 	border: 1px solid #99f6e4;
 	border-radius: 8px;
 	color: #0f766e;
+	cursor: pointer;
 	display: inline-flex;
+	font: inherit;
 	font-weight: 800;
 	min-height: 34px;
 	padding: 6px 10px;
+	text-decoration: none;
 }
 
 .klientoora-admin-main-products__empty {
@@ -1582,6 +1626,51 @@ body.klientoora-admin-main {
 	width: 100%;
 }
 
+.klientoora-admin-main-product-dialog__image-control {
+	align-items: center;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	display: grid !important;
+	gap: 10px;
+	grid-template-columns: 72px auto auto;
+	padding: 10px;
+}
+
+.klientoora-admin-main-product-dialog__image-preview {
+	align-items: center;
+	background: #f8fafc;
+	border: 1px solid #e5edf5;
+	border-radius: 8px;
+	color: #64748b;
+	display: inline-flex;
+	font-size: 11px;
+	font-weight: 800;
+	height: 64px;
+	justify-content: center;
+	overflow: hidden;
+	text-align: center;
+	width: 64px;
+}
+
+.klientoora-admin-main-product-dialog__image-preview img {
+	display: block;
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.klientoora-admin-main-product-dialog__image-control button {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	color: #334155;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	min-height: 40px;
+	padding: 8px 12px;
+}
+
 .klientoora-admin-main-product-dialog__footer {
 	border-top: 1px solid #e5edf5;
 }
@@ -2032,5 +2121,9 @@ body.klientoora-admin-main {
 	.klientoora-admin-main-product-dialog__footer {
 		align-items: stretch;
 		flex-direction: column;
+	}
+
+	.klientoora-admin-main-product-dialog__image-control {
+		grid-template-columns: 1fr;
 	}
 }

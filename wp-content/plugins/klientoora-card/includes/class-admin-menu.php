@@ -1612,7 +1612,7 @@ class Klientoora_Card_Admin_Menu {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			?>
 			<div class="klientoora-admin-main-products">
-				<h2><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></h2>
+				<h2><?php echo esc_html__( 'קטלוג מוצרים', 'klientoora-card' ); ?></h2>
 				<p><?php echo esc_html__( 'You do not have permission to view products.', 'klientoora-card' ); ?></p>
 			</div>
 			<?php
@@ -1622,16 +1622,22 @@ class Klientoora_Card_Admin_Menu {
 		$notice  = isset( $_GET['klientoora_card_products_notice'] ) ? sanitize_key( wp_unslash( $_GET['klientoora_card_products_notice'] ) ) : '';
 		$products = class_exists( 'Klientoora_Card_Product_Redemption' ) ? Klientoora_Card_Product_Redemption::get_admin_products() : array();
 		$stats    = $this->get_admin_main_products_stats( $products );
+		$categories = $this->get_admin_main_product_categories();
 		?>
 		<div class="klientoora-admin-main-products">
 			<header class="klientoora-admin-main-products__header">
 				<div>
-					<h2><?php echo esc_html__( 'מוצרים', 'klientoora-card' ); ?></h2>
+					<h2><?php echo esc_html__( 'קטלוג מוצרים', 'klientoora-card' ); ?></h2>
 					<p><?php echo esc_html__( 'Products synced from WooCommerce.', 'klientoora-card' ); ?></p>
 				</div>
-				<button type="button" data-klientoora-product-dialog-trigger="klientoora-admin-main-product-create-dialog">
-					<?php echo esc_html__( 'הוספת מוצר', 'klientoora-card' ); ?>
-				</button>
+				<div class="klientoora-admin-main-products__actions">
+					<button type="button" data-klientoora-product-dialog-trigger="klientoora-admin-main-product-create-dialog">
+						<?php echo esc_html__( 'הוספת מוצר', 'klientoora-card' ); ?>
+					</button>
+					<button type="button" data-klientoora-category-dialog-trigger="klientoora-admin-main-product-category-dialog">
+						<?php echo esc_html__( 'הוספת קטגוריה', 'klientoora-card' ); ?>
+					</button>
+				</div>
 			</header>
 
 			<?php $this->render_admin_main_products_notice( $notice ); ?>
@@ -1648,13 +1654,35 @@ class Klientoora_Card_Admin_Menu {
 					?>
 				</div>
 
+				<div class="klientoora-admin-main-products__filters" aria-label="<?php echo esc_attr__( 'סינון מוצרים', 'klientoora-card' ); ?>">
+					<label>
+						<span><?php echo esc_html__( 'קטגוריה', 'klientoora-card' ); ?></span>
+						<select data-klientoora-product-category-filter>
+							<option value=""><?php echo esc_html__( 'כל הקטגוריות', 'klientoora-card' ); ?></option>
+							<?php foreach ( $categories as $category ) : ?>
+								<option value="<?php echo esc_attr( (string) $category->term_id ); ?>"><?php echo esc_html( $category->name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</label>
+					<label>
+						<span><?php echo esc_html__( 'תצוגה', 'klientoora-card' ); ?></span>
+						<select data-klientoora-product-visibility-filter>
+							<option value=""><?php echo esc_html__( 'הכל', 'klientoora-card' ); ?></option>
+							<option value="active"><?php echo esc_html__( 'מוצג ופעיל', 'klientoora-card' ); ?></option>
+							<option value="inactive"><?php echo esc_html__( 'לא מוצג', 'klientoora-card' ); ?></option>
+						</select>
+					</label>
+				</div>
+
 				<div class="klientoora-admin-main-products__table-wrap">
 					<table class="klientoora-admin-main-products__table">
 						<thead>
 							<tr>
 								<th><?php echo esc_html__( 'מוצר', 'klientoora-card' ); ?></th>
+								<th><?php echo esc_html__( 'קטגוריה', 'klientoora-card' ); ?></th>
 								<th><?php echo esc_html__( 'מחיר', 'klientoora-card' ); ?></th>
 								<th><?php echo esc_html__( 'סטטוס', 'klientoora-card' ); ?></th>
+								<th><?php echo esc_html__( 'תצוגה', 'klientoora-card' ); ?></th>
 								<th><?php echo esc_html__( 'מלאי', 'klientoora-card' ); ?></th>
 								<th><?php echo esc_html__( 'SKU', 'klientoora-card' ); ?></th>
 								<th><?php echo esc_html__( 'מימוש נקודות', 'klientoora-card' ); ?></th>
@@ -1664,7 +1692,7 @@ class Klientoora_Card_Admin_Menu {
 						<tbody>
 							<?php if ( empty( $products ) ) : ?>
 								<tr>
-									<td colspan="7"><?php echo esc_html__( 'No products found.', 'klientoora-card' ); ?></td>
+									<td colspan="9"><?php echo esc_html__( 'No products found.', 'klientoora-card' ); ?></td>
 								</tr>
 							<?php else : ?>
 								<?php foreach ( $products as $product ) : ?>
@@ -1675,7 +1703,11 @@ class Klientoora_Card_Admin_Menu {
 					</table>
 				</div>
 
-				<?php $this->render_admin_main_product_create_dialog(); ?>
+				<?php $this->render_admin_main_product_create_dialog( $categories ); ?>
+				<?php foreach ( $products as $product ) : ?>
+					<?php $this->render_admin_main_product_edit_dialog( $product, $categories ); ?>
+				<?php endforeach; ?>
+				<?php $this->render_admin_main_product_category_dialog(); ?>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -3411,6 +3443,28 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
+	 * Returns WooCommerce product categories for admin-main controls.
+	 *
+	 * @return array<int, WP_Term>
+	 */
+	private function get_admin_main_product_categories() {
+		if ( ! taxonomy_exists( 'product_cat' ) ) {
+			return array();
+		}
+
+		$categories = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			)
+		);
+
+		return is_wp_error( $categories ) ? array() : $categories;
+	}
+
+	/**
 	 * Renders one admin-main products stat card.
 	 *
 	 * @param string $label Stat label.
@@ -3436,23 +3490,39 @@ class Klientoora_Card_Admin_Menu {
 	 */
 	private function render_admin_main_product_row( $product ) {
 		$product_id     = $product->get_id();
-		$edit_url       = get_edit_post_link( $product_id );
 		$image_id       = $product->get_image_id();
 		$image          = $image_id ? wp_get_attachment_image( $image_id, 'thumbnail' ) : ( function_exists( 'wc_placeholder_img' ) ? wc_placeholder_img( 'thumbnail' ) : '' );
+		$categories     = wp_get_post_terms( $product_id, 'product_cat' );
+		$category_ids   = array();
+		$category_names = array();
 		$points_enabled = class_exists( 'Klientoora_Card_Product_Redemption' ) && 'yes' === get_post_meta( $product_id, Klientoora_Card_Product_Redemption::META_ENABLED, true );
 		$points_price   = class_exists( 'Klientoora_Card_Product_Redemption' ) ? Klientoora_Card_Product_Redemption::get_product_points_price( $product ) : 0;
 		$stock_status   = function_exists( 'wc_get_product_stock_status_options' ) ? wc_get_product_stock_status_options() : array();
 		$stock_label    = isset( $stock_status[ $product->get_stock_status() ] ) ? $stock_status[ $product->get_stock_status() ] : $product->get_stock_status();
+		$is_visible     = 'publish' === $product->get_status() && 'hidden' !== $product->get_catalog_visibility();
+
+		if ( ! is_wp_error( $categories ) ) {
+			foreach ( $categories as $category ) {
+				$category_ids[]   = (string) $category->term_id;
+				$category_names[] = $category->name;
+			}
+		}
 		?>
-		<tr>
+		<tr data-klientoora-product-row data-category-ids="<?php echo esc_attr( implode( ',', $category_ids ) ); ?>" data-product-visibility="<?php echo esc_attr( $is_visible ? 'active' : 'inactive' ); ?>">
 			<td>
 				<div class="klientoora-admin-main-products__product">
 					<span class="klientoora-admin-main-products__image"><?php echo wp_kses_post( $image ); ?></span>
 					<strong><?php echo esc_html( $product->get_name() ); ?></strong>
 				</div>
 			</td>
+			<td><?php echo esc_html( ! empty( $category_names ) ? implode( ', ', $category_names ) : '-' ); ?></td>
 			<td><?php echo wp_kses_post( $product->get_price_html() ? $product->get_price_html() : '-' ); ?></td>
 			<td><?php echo esc_html( $product->get_status() ); ?></td>
+			<td>
+				<span class="klientoora-admin-main-products__badge <?php echo esc_attr( $is_visible ? 'is-enabled' : 'is-disabled' ); ?>">
+					<?php echo esc_html( $is_visible ? __( 'מוצג ופעיל', 'klientoora-card' ) : __( 'לא מוצג', 'klientoora-card' ) ); ?>
+				</span>
+			</td>
 			<td><?php echo esc_html( $stock_label ); ?></td>
 			<td><?php echo esc_html( $product->get_sku() ? $product->get_sku() : '-' ); ?></td>
 			<td>
@@ -3461,11 +3531,9 @@ class Klientoora_Card_Admin_Menu {
 				</span>
 			</td>
 			<td>
-				<?php if ( $edit_url ) : ?>
-					<a class="klientoora-admin-main-products__action" href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html__( 'עריכה', 'klientoora-card' ); ?></a>
-				<?php else : ?>
-					<span><?php echo esc_html__( 'No actions available', 'klientoora-card' ); ?></span>
-				<?php endif; ?>
+				<button type="button" class="klientoora-admin-main-products__action" data-klientoora-product-dialog-trigger="<?php echo esc_attr( 'klientoora-admin-main-product-edit-dialog-' . $product_id ); ?>">
+					<?php echo esc_html__( 'עריכה', 'klientoora-card' ); ?>
+				</button>
 			</td>
 		</tr>
 		<?php
@@ -3476,7 +3544,7 @@ class Klientoora_Card_Admin_Menu {
 	 *
 	 * @return void
 	 */
-	private function render_admin_main_product_create_dialog() {
+	private function render_admin_main_product_create_dialog( $categories = array() ) {
 		?>
 		<dialog class="klientoora-admin-main-product-dialog" id="klientoora-admin-main-product-create-dialog" aria-labelledby="klientoora-admin-main-product-create-title">
 			<form class="klientoora-admin-main-product-dialog__surface" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
@@ -3505,6 +3573,26 @@ class Klientoora_Card_Admin_Menu {
 					<div>
 						<label for="klientoora_product_sku"><?php echo esc_html__( 'SKU', 'klientoora-card' ); ?></label>
 						<input type="text" id="klientoora_product_sku" name="product_sku" />
+					</div>
+					<div>
+						<label for="klientoora_product_category_id"><?php echo esc_html__( 'קטגוריה', 'klientoora-card' ); ?></label>
+						<select id="klientoora_product_category_id" name="product_category_id">
+							<option value="0"><?php echo esc_html__( 'ללא קטגוריה', 'klientoora-card' ); ?></option>
+							<?php foreach ( $categories as $category ) : ?>
+								<option value="<?php echo esc_attr( (string) $category->term_id ); ?>"><?php echo esc_html( $category->name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="is-wide">
+						<label><?php echo esc_html__( 'תמונת מוצר', 'klientoora-card' ); ?></label>
+						<div class="klientoora-admin-main-product-dialog__image-control">
+							<input type="hidden" name="product_image_id" value="" data-klientoora-product-image-id />
+							<div class="klientoora-admin-main-product-dialog__image-preview" data-klientoora-product-image-preview>
+								<span><?php echo esc_html__( 'לא נבחרה תמונה', 'klientoora-card' ); ?></span>
+							</div>
+							<button type="button" data-klientoora-product-image-select><?php echo esc_html__( 'בחירת תמונה', 'klientoora-card' ); ?></button>
+							<button type="button" data-klientoora-product-image-clear><?php echo esc_html__( 'ניקוי', 'klientoora-card' ); ?></button>
+						</div>
 					</div>
 					<div>
 						<label for="klientoora_product_regular_price"><?php echo esc_html__( 'מחיר רגיל', 'klientoora-card' ); ?></label>
@@ -3546,6 +3634,152 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
+	 * Renders the edit product dialog for admin-main.
+	 *
+	 * @param WC_Product $product    Product object.
+	 * @param array      $categories Product categories.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_product_edit_dialog( $product, $categories = array() ) {
+		$product_id       = $product->get_id();
+		$category_ids     = $product->get_category_ids();
+		$selected_term_id = ! empty( $category_ids ) ? absint( $category_ids[0] ) : 0;
+		$image_id         = $product->get_image_id();
+		$image            = $image_id ? wp_get_attachment_image( $image_id, 'thumbnail' ) : '';
+		?>
+		<dialog class="klientoora-admin-main-product-dialog" id="<?php echo esc_attr( 'klientoora-admin-main-product-edit-dialog-' . $product_id ); ?>" aria-labelledby="<?php echo esc_attr( 'klientoora-admin-main-product-edit-title-' . $product_id ); ?>">
+			<form class="klientoora-admin-main-product-dialog__surface" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+				<?php wp_nonce_field( 'klientoora_card_update_product_' . $product_id ); ?>
+				<input type="hidden" name="action" value="klientoora_card_update_product" />
+				<input type="hidden" name="product_id" value="<?php echo esc_attr( (string) $product_id ); ?>" />
+				<header class="klientoora-admin-main-product-dialog__header">
+					<div>
+						<p><?php echo esc_html__( 'WooCommerce', 'klientoora-card' ); ?></p>
+						<h3 id="<?php echo esc_attr( 'klientoora-admin-main-product-edit-title-' . $product_id ); ?>"><?php echo esc_html__( 'עריכת מוצר', 'klientoora-card' ); ?></h3>
+					</div>
+					<button type="button" data-klientoora-product-dialog-close aria-label="<?php echo esc_attr__( 'Close dialog', 'klientoora-card' ); ?>">&times;</button>
+				</header>
+
+				<div class="klientoora-admin-main-product-dialog__grid">
+					<div class="is-wide">
+						<label for="<?php echo esc_attr( 'klientoora_product_name_' . $product_id ); ?>"><?php echo esc_html__( 'שם מוצר', 'klientoora-card' ); ?></label>
+						<input type="text" id="<?php echo esc_attr( 'klientoora_product_name_' . $product_id ); ?>" name="product_name" value="<?php echo esc_attr( $product->get_name() ); ?>" required />
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_status_' . $product_id ); ?>"><?php echo esc_html__( 'סטטוס', 'klientoora-card' ); ?></label>
+						<select id="<?php echo esc_attr( 'klientoora_product_status_' . $product_id ); ?>" name="product_status">
+							<option value="publish" <?php selected( $product->get_status(), 'publish' ); ?>><?php echo esc_html__( 'פעיל', 'klientoora-card' ); ?></option>
+							<option value="draft" <?php selected( $product->get_status(), 'draft' ); ?>><?php echo esc_html__( 'טיוטה', 'klientoora-card' ); ?></option>
+						</select>
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_sku_' . $product_id ); ?>"><?php echo esc_html__( 'SKU', 'klientoora-card' ); ?></label>
+						<input type="text" id="<?php echo esc_attr( 'klientoora_product_sku_' . $product_id ); ?>" name="product_sku" value="<?php echo esc_attr( $product->get_sku() ); ?>" />
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_category_id_' . $product_id ); ?>"><?php echo esc_html__( 'קטגוריה', 'klientoora-card' ); ?></label>
+						<select id="<?php echo esc_attr( 'klientoora_product_category_id_' . $product_id ); ?>" name="product_category_id">
+							<option value="0"><?php echo esc_html__( 'ללא קטגוריה', 'klientoora-card' ); ?></option>
+							<?php foreach ( $categories as $category ) : ?>
+								<option value="<?php echo esc_attr( (string) $category->term_id ); ?>" <?php selected( $selected_term_id, $category->term_id ); ?>><?php echo esc_html( $category->name ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="is-wide">
+						<label><?php echo esc_html__( 'תמונת מוצר', 'klientoora-card' ); ?></label>
+						<div class="klientoora-admin-main-product-dialog__image-control">
+							<input type="hidden" name="product_image_id" value="<?php echo esc_attr( (string) $image_id ); ?>" data-klientoora-product-image-id />
+							<div class="klientoora-admin-main-product-dialog__image-preview" data-klientoora-product-image-preview>
+								<?php if ( $image ) : ?>
+									<?php echo wp_kses_post( $image ); ?>
+								<?php else : ?>
+									<span><?php echo esc_html__( 'לא נבחרה תמונה', 'klientoora-card' ); ?></span>
+								<?php endif; ?>
+							</div>
+							<button type="button" data-klientoora-product-image-select><?php echo esc_html__( 'בחירת תמונה', 'klientoora-card' ); ?></button>
+							<button type="button" data-klientoora-product-image-clear><?php echo esc_html__( 'ניקוי', 'klientoora-card' ); ?></button>
+						</div>
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_regular_price_' . $product_id ); ?>"><?php echo esc_html__( 'מחיר רגיל', 'klientoora-card' ); ?></label>
+						<input type="number" id="<?php echo esc_attr( 'klientoora_product_regular_price_' . $product_id ); ?>" name="regular_price" min="0" step="0.01" inputmode="decimal" value="<?php echo esc_attr( $product->get_regular_price() ); ?>" />
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_sale_price_' . $product_id ); ?>"><?php echo esc_html__( 'מחיר מבצע', 'klientoora-card' ); ?></label>
+						<input type="number" id="<?php echo esc_attr( 'klientoora_product_sale_price_' . $product_id ); ?>" name="sale_price" min="0" step="0.01" inputmode="decimal" value="<?php echo esc_attr( $product->get_sale_price() ); ?>" />
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_stock_status_' . $product_id ); ?>"><?php echo esc_html__( 'מלאי', 'klientoora-card' ); ?></label>
+						<select id="<?php echo esc_attr( 'klientoora_product_stock_status_' . $product_id ); ?>" name="stock_status">
+							<option value="instock" <?php selected( $product->get_stock_status(), 'instock' ); ?>><?php echo esc_html__( 'במלאי', 'klientoora-card' ); ?></option>
+							<option value="outofstock" <?php selected( $product->get_stock_status(), 'outofstock' ); ?>><?php echo esc_html__( 'אזל מהמלאי', 'klientoora-card' ); ?></option>
+							<option value="onbackorder" <?php selected( $product->get_stock_status(), 'onbackorder' ); ?>><?php echo esc_html__( 'הזמנה מראש', 'klientoora-card' ); ?></option>
+						</select>
+					</div>
+					<div>
+						<label for="<?php echo esc_attr( 'klientoora_product_stock_quantity_' . $product_id ); ?>"><?php echo esc_html__( 'כמות במלאי', 'klientoora-card' ); ?></label>
+						<input type="number" id="<?php echo esc_attr( 'klientoora_product_stock_quantity_' . $product_id ); ?>" name="stock_quantity" min="0" step="1" inputmode="numeric" value="<?php echo esc_attr( $product->managing_stock() ? (string) $product->get_stock_quantity() : '' ); ?>" />
+					</div>
+					<div class="is-wide">
+						<label for="<?php echo esc_attr( 'klientoora_product_short_description_' . $product_id ); ?>"><?php echo esc_html__( 'תיאור קצר', 'klientoora-card' ); ?></label>
+						<textarea id="<?php echo esc_attr( 'klientoora_product_short_description_' . $product_id ); ?>" name="short_description" rows="3"><?php echo esc_textarea( $product->get_short_description() ); ?></textarea>
+					</div>
+					<div class="is-wide">
+						<label for="<?php echo esc_attr( 'klientoora_product_description_' . $product_id ); ?>"><?php echo esc_html__( 'תיאור מלא', 'klientoora-card' ); ?></label>
+						<textarea id="<?php echo esc_attr( 'klientoora_product_description_' . $product_id ); ?>" name="description" rows="5"><?php echo esc_textarea( $product->get_description() ); ?></textarea>
+					</div>
+				</div>
+
+				<footer class="klientoora-admin-main-product-dialog__footer">
+					<button type="button" data-klientoora-product-dialog-close><?php echo esc_html__( 'ביטול', 'klientoora-card' ); ?></button>
+					<button type="submit"><?php echo esc_html__( 'שמירת שינויים', 'klientoora-card' ); ?></button>
+				</footer>
+			</form>
+		</dialog>
+		<?php
+	}
+
+	/**
+	 * Renders the create product category dialog for admin-main.
+	 *
+	 * @return void
+	 */
+	private function render_admin_main_product_category_dialog() {
+		?>
+		<dialog class="klientoora-admin-main-product-dialog" id="klientoora-admin-main-product-category-dialog" aria-labelledby="klientoora-admin-main-product-category-title">
+			<form class="klientoora-admin-main-product-dialog__surface" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+				<?php wp_nonce_field( 'klientoora_card_create_product_category' ); ?>
+				<input type="hidden" name="action" value="klientoora_card_create_product_category" />
+				<header class="klientoora-admin-main-product-dialog__header">
+					<div>
+						<p><?php echo esc_html__( 'WooCommerce', 'klientoora-card' ); ?></p>
+						<h3 id="klientoora-admin-main-product-category-title"><?php echo esc_html__( 'הוספת קטגוריה', 'klientoora-card' ); ?></h3>
+					</div>
+					<button type="button" data-klientoora-category-dialog-close aria-label="<?php echo esc_attr__( 'Close dialog', 'klientoora-card' ); ?>">&times;</button>
+				</header>
+
+				<div class="klientoora-admin-main-product-dialog__grid">
+					<div class="is-wide">
+						<label for="klientoora_product_category_name"><?php echo esc_html__( 'שם קטגוריה', 'klientoora-card' ); ?></label>
+						<input type="text" id="klientoora_product_category_name" name="category_name" required />
+					</div>
+					<div class="is-wide">
+						<label for="klientoora_product_category_slug"><?php echo esc_html__( 'Slug', 'klientoora-card' ); ?></label>
+						<input type="text" id="klientoora_product_category_slug" name="category_slug" />
+					</div>
+				</div>
+
+				<footer class="klientoora-admin-main-product-dialog__footer">
+					<button type="button" data-klientoora-category-dialog-close><?php echo esc_html__( 'ביטול', 'klientoora-card' ); ?></button>
+					<button type="submit"><?php echo esc_html__( 'שמירת קטגוריה', 'klientoora-card' ); ?></button>
+				</footer>
+			</form>
+		</dialog>
+		<?php
+	}
+
+	/**
 	 * Renders admin-main product notices as toasts.
 	 *
 	 * @param string $notice Notice key.
@@ -3555,16 +3789,21 @@ class Klientoora_Card_Admin_Menu {
 	private function render_admin_main_products_notice( $notice ) {
 		$messages = array(
 			'created'              => __( 'המוצר נוצר בווקומרס.', 'klientoora-card' ),
+			'updated'              => __( 'המוצר עודכן בווקומרס.', 'klientoora-card' ),
+			'category_created'     => __( 'קטגוריית המוצר נוצרה בווקומרס.', 'klientoora-card' ),
 			'missing_name'         => __( 'יש להזין שם מוצר.', 'klientoora-card' ),
+			'missing_category_name' => __( 'יש להזין שם קטגוריה.', 'klientoora-card' ),
 			'woocommerce_inactive' => __( 'WooCommerce is not active.', 'klientoora-card' ),
 			'sku_exists'           => __( 'SKU זה כבר קיים במוצר אחר.', 'klientoora-card' ),
+			'product_missing'      => __( 'המוצר לא נמצא בווקומרס.', 'klientoora-card' ),
+			'category_exists'      => __( 'לא ניתן ליצור את הקטגוריה. ייתכן שהיא כבר קיימת.', 'klientoora-card' ),
 		);
 
 		if ( empty( $messages[ $notice ] ) ) {
 			return;
 		}
 
-		$type = in_array( $notice, array( 'created' ), true ) ? 'success' : 'error';
+		$type = in_array( $notice, array( 'created', 'updated', 'category_created' ), true ) ? 'success' : 'error';
 		$this->render_admin_main_toast( $messages[ $notice ], $type );
 	}
 
@@ -3931,6 +4170,8 @@ class Klientoora_Card_Admin_Menu {
 		$regular_price = isset( $_POST['regular_price'] ) ? wc_format_decimal( wp_unslash( $_POST['regular_price'] ) ) : '';
 		$sale_price    = isset( $_POST['sale_price'] ) ? wc_format_decimal( wp_unslash( $_POST['sale_price'] ) ) : '';
 		$stock_quantity = isset( $_POST['stock_quantity'] ) && '' !== $_POST['stock_quantity'] ? absint( wp_unslash( $_POST['stock_quantity'] ) ) : null;
+		$category_id    = isset( $_POST['product_category_id'] ) ? absint( wp_unslash( $_POST['product_category_id'] ) ) : 0;
+		$image_id       = isset( $_POST['product_image_id'] ) ? absint( wp_unslash( $_POST['product_image_id'] ) ) : 0;
 
 		$product = new WC_Product_Simple();
 		$product->set_name( $name );
@@ -3948,9 +4189,140 @@ class Klientoora_Card_Admin_Menu {
 			$product->set_stock_quantity( $stock_quantity );
 		}
 
+		if ( $category_id && term_exists( $category_id, 'product_cat' ) ) {
+			$product->set_category_ids( array( $category_id ) );
+		}
+
+		if ( $image_id && wp_attachment_is_image( $image_id ) ) {
+			$product->set_image_id( $image_id );
+		}
+
 		$product->save();
 
 		$this->redirect_admin_main_products_page( 'created' );
+	}
+
+	/**
+	 * Handles updating a WooCommerce product from admin-main.
+	 *
+	 * @return void
+	 */
+	public function handle_update_product() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'klientoora-card' ) );
+		}
+
+		if ( ! function_exists( 'wc_get_product' ) ) {
+			$this->redirect_admin_main_products_page( 'woocommerce_inactive' );
+		}
+
+		$product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
+
+		if ( ! $product_id ) {
+			$this->redirect_admin_main_products_page( 'product_missing' );
+		}
+
+		check_admin_referer( 'klientoora_card_update_product_' . $product_id );
+
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product ) {
+			$this->redirect_admin_main_products_page( 'product_missing' );
+		}
+
+		$name = isset( $_POST['product_name'] ) ? sanitize_text_field( wp_unslash( $_POST['product_name'] ) ) : '';
+
+		if ( '' === $name ) {
+			$this->redirect_admin_main_products_page( 'missing_name' );
+		}
+
+		$sku             = isset( $_POST['product_sku'] ) ? sanitize_text_field( wp_unslash( $_POST['product_sku'] ) ) : '';
+		$existing_sku_id = '' !== $sku && function_exists( 'wc_get_product_id_by_sku' ) ? wc_get_product_id_by_sku( $sku ) : 0;
+
+		if ( $existing_sku_id && (int) $existing_sku_id !== (int) $product_id ) {
+			$this->redirect_admin_main_products_page( 'sku_exists' );
+		}
+
+		$status         = isset( $_POST['product_status'] ) ? sanitize_key( wp_unslash( $_POST['product_status'] ) ) : 'publish';
+		$status         = in_array( $status, array( 'publish', 'draft' ), true ) ? $status : 'draft';
+		$stock_status   = isset( $_POST['stock_status'] ) ? sanitize_key( wp_unslash( $_POST['stock_status'] ) ) : 'instock';
+		$stock_status   = in_array( $stock_status, array( 'instock', 'outofstock', 'onbackorder' ), true ) ? $stock_status : 'instock';
+		$regular_price  = isset( $_POST['regular_price'] ) ? wc_format_decimal( wp_unslash( $_POST['regular_price'] ) ) : '';
+		$sale_price     = isset( $_POST['sale_price'] ) ? wc_format_decimal( wp_unslash( $_POST['sale_price'] ) ) : '';
+		$category_id    = isset( $_POST['product_category_id'] ) ? absint( wp_unslash( $_POST['product_category_id'] ) ) : 0;
+		$image_id       = isset( $_POST['product_image_id'] ) ? absint( wp_unslash( $_POST['product_image_id'] ) ) : 0;
+		$stock_quantity = isset( $_POST['stock_quantity'] ) && '' !== $_POST['stock_quantity'] ? absint( wp_unslash( $_POST['stock_quantity'] ) ) : null;
+
+		$product->set_name( $name );
+		$product->set_status( $status );
+		$product->set_catalog_visibility( 'publish' === $status ? 'visible' : 'hidden' );
+		$product->set_description( isset( $_POST['description'] ) ? wp_kses_post( wp_unslash( $_POST['description'] ) ) : '' );
+		$product->set_short_description( isset( $_POST['short_description'] ) ? wp_kses_post( wp_unslash( $_POST['short_description'] ) ) : '' );
+		$product->set_sku( $sku );
+		$product->set_regular_price( $regular_price );
+		$product->set_sale_price( $sale_price );
+		$product->set_stock_status( $stock_status );
+
+		if ( null !== $stock_quantity ) {
+			$product->set_manage_stock( true );
+			$product->set_stock_quantity( $stock_quantity );
+		} else {
+			$product->set_manage_stock( false );
+		}
+
+		if ( $category_id && term_exists( $category_id, 'product_cat' ) ) {
+			$product->set_category_ids( array( $category_id ) );
+		} else {
+			$product->set_category_ids( array() );
+		}
+
+		if ( $image_id && wp_attachment_is_image( $image_id ) ) {
+			$product->set_image_id( $image_id );
+		} else {
+			$product->set_image_id( '' );
+		}
+
+		$product->save();
+
+		$this->redirect_admin_main_products_page( 'updated' );
+	}
+
+	/**
+	 * Handles creating a WooCommerce product category from admin-main.
+	 *
+	 * @return void
+	 */
+	public function handle_create_product_category() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'klientoora-card' ) );
+		}
+
+		check_admin_referer( 'klientoora_card_create_product_category' );
+
+		if ( ! taxonomy_exists( 'product_cat' ) ) {
+			$this->redirect_admin_main_products_page( 'woocommerce_inactive' );
+		}
+
+		$name = isset( $_POST['category_name'] ) ? sanitize_text_field( wp_unslash( $_POST['category_name'] ) ) : '';
+
+		if ( '' === $name ) {
+			$this->redirect_admin_main_products_page( 'missing_category_name' );
+		}
+
+		$args = array();
+		$slug = isset( $_POST['category_slug'] ) ? sanitize_title( wp_unslash( $_POST['category_slug'] ) ) : '';
+
+		if ( '' !== $slug ) {
+			$args['slug'] = $slug;
+		}
+
+		$result = wp_insert_term( $name, 'product_cat', $args );
+
+		if ( is_wp_error( $result ) ) {
+			$this->redirect_admin_main_products_page( 'category_exists' );
+		}
+
+		$this->redirect_admin_main_products_page( 'category_created' );
 	}
 
 	/**
