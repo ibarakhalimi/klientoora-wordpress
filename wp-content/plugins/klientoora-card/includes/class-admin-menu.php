@@ -1319,6 +1319,59 @@ class Klientoora_Card_Admin_Menu {
 	}
 
 	/**
+	 * Renders the dashboard view for the standalone admin-main page.
+	 *
+	 * @return void
+	 */
+	public function render_dashboard_admin_main_view() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			?>
+			<div class="klientoora-admin-main-dashboard">
+				<h2><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></h2>
+				<p><?php echo esc_html__( 'You do not have permission to view the dashboard.', 'klientoora-card' ); ?></p>
+			</div>
+			<?php
+			return;
+		}
+
+		$new_orders_count = $this->get_admin_main_new_orders_count();
+		?>
+		<div class="klientoora-admin-main-dashboard">
+			<header class="klientoora-admin-main-dashboard__header">
+				<h2><?php echo esc_html__( 'דשבורד', 'klientoora-card' ); ?></h2>
+			</header>
+
+			<div class="klientoora-admin-main-dashboard__grid">
+				<section class="klientoora-admin-main-dashboard__card" aria-labelledby="klientoora-admin-main-dashboard-orders-title">
+					<div>
+						<span><?php echo esc_html__( 'הזמנות', 'klientoora-card' ); ?></span>
+						<h3 id="klientoora-admin-main-dashboard-orders-title"><?php echo esc_html__( 'הזמנות חדשות לטיפול', 'klientoora-card' ); ?></h3>
+					</div>
+					<strong><?php echo esc_html( number_format_i18n( $new_orders_count ) ); ?></strong>
+					<a href="#orders"><?php echo esc_html__( 'לטיפול בהזמנות', 'klientoora-card' ); ?></a>
+				</section>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Returns the number of orders currently in the new Klientoora status.
+	 *
+	 * @return int
+	 */
+	private function get_admin_main_new_orders_count() {
+		if ( ! function_exists( 'wc_get_orders' ) ) {
+			return 0;
+		}
+
+		$orders           = $this->get_orders_for_management();
+		$orders_by_status = $this->group_orders_by_klientoora_status( $orders );
+
+		return isset( $orders_by_status['new'] ) ? count( $orders_by_status['new'] ) : 0;
+	}
+
+	/**
 	 * Renders the orders management page.
 	 *
 	 * @return void

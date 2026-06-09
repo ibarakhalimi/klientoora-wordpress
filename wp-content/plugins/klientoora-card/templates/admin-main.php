@@ -47,7 +47,7 @@ $klientoora_admin_menu = new Klientoora_Card_Admin_Menu();
 
 			<main class="klientoora-admin-main__content" id="dashboard">
 				<section class="klientoora-admin-main__panel" id="dashboard-panel" data-klientoora-admin-main-panel="dashboard">
-					<h2><?php echo esc_html__( 'ברוך הבא למערכת הניהול', 'klientoora-card' ); ?></h2>
+					<?php $klientoora_admin_menu->render_dashboard_admin_main_view(); ?>
 				</section>
 
 				<section class="klientoora-admin-main__panel" id="orders-panel" data-klientoora-admin-main-panel="orders" hidden>

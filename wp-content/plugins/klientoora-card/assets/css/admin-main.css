@@ -129,6 +129,68 @@ body.klientoora-admin-main {
 	margin: 0;
 }
 
+.klientoora-admin-main-dashboard {
+	display: grid;
+	gap: 22px;
+}
+
+.klientoora-admin-main-dashboard__header h2 {
+	color: #0f172a;
+	font-size: 24px;
+	line-height: 1.3;
+	margin: 0;
+}
+
+.klientoora-admin-main-dashboard__grid {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.klientoora-admin-main-dashboard__card {
+	background: #f8fafc;
+	border: 1px solid #d9e1ea;
+	border-radius: 8px;
+	display: grid;
+	gap: 16px;
+	min-height: 220px;
+	padding: 18px;
+}
+
+.klientoora-admin-main-dashboard__card span {
+	color: #0f766e;
+	font-size: 12px;
+	font-weight: 900;
+}
+
+.klientoora-admin-main-dashboard__card h3 {
+	color: #0f172a;
+	font-size: 18px;
+	line-height: 1.25;
+	margin: 4px 0 0;
+}
+
+.klientoora-admin-main-dashboard__card strong {
+	color: #0f172a;
+	font-size: 42px;
+	line-height: 1;
+}
+
+.klientoora-admin-main-dashboard__card a {
+	align-items: center;
+	background: #0f766e;
+	border: 1px solid #0f766e;
+	border-radius: 8px;
+	color: #fff;
+	display: inline-flex;
+	font-size: 14px;
+	font-weight: 800;
+	justify-content: center;
+	justify-self: start;
+	min-height: 42px;
+	padding: 8px 14px;
+}
+
 .klientoora-admin-main-orders {
 	display: grid;
 	gap: 22px;
@@ -1866,6 +1928,10 @@ body.klientoora-admin-main {
 	}
 
 	.klientoora-admin-main-members__stats {
+		grid-template-columns: 1fr;
+	}
+
+	.klientoora-admin-main-dashboard__grid {
 		grid-template-columns: 1fr;
 	}
 
